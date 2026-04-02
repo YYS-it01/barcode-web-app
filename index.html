@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Barcode Mobile Web App</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --ink: #0f172a;
+      --muted: #475569;
+      --line: #e2e8f0;
+      --brand: #2563eb;
+      --ok: #166534;
+      --warn: #b45309;
+      --err: #b91c1c;
+      --shadow: 0 8px 24px rgba(15,23,42,.08);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(180deg, #eff6ff 0%, var(--bg) 220px);
+      color: var(--ink);
+    }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 16px 14px 40px; }
+    .hero, .card {
+      background: var(--card);
+      border: 1px solid rgba(226,232,240,.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero { padding: 18px; margin-bottom: 14px; }
+    h1 { margin: 0 0 8px; font-size: 1.45rem; }
+    h2 { margin: 0 0 10px; font-size: 1.05rem; }
+    p { margin: 0; color: var(--muted); line-height: 1.5; }
+    .grid { display: grid; gap: 14px; }
+    .cols { grid-template-columns: 1fr; }
+    @media (min-width: 900px) { .cols { grid-template-columns: 1.1fr .9fr; } }
+    .card { padding: 16px; }
+    .row { display: grid; gap: 10px; }
+    .row2 { grid-template-columns: 1fr 1fr; }
+    .row3 { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 680px) { .row2, .row3 { grid-template-columns: 1fr; } }
+    label { display: block; font-size: .92rem; font-weight: 700; margin-bottom: 6px; }
+    input[type="text"], input[type="search"], input[type="number"], select, textarea {
+      width: 100%; padding: 12px 13px; border-radius: 14px; border: 1px solid #cbd5e1;
+      background: #fff; font-size: 16px; color: var(--ink);
+    }
+    textarea { min-height: 150px; resize: vertical; }
+    .btns { display: flex; flex-wrap: wrap; gap: 10px; }
+    button, .btn {
+      appearance: none; border: 0; border-radius: 14px; padding: 12px 14px; font-size: 15px;
+      font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
+    }
+    .primary { background: var(--brand); color: #fff; }
+    .secondary { background: #e2e8f0; color: var(--ink); }
+    .ghost { background: #fff; color: var(--ink); border: 1px solid #cbd5e1; }
+    .danger { background: #fee2e2; color: #991b1b; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; font-size: .88rem;
+      background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
+    }
+    .status.ok { background: #ecfdf5; color: var(--ok); border-color: #bbf7d0; }
+    .status.warn { background: #fff7ed; color: var(--warn); border-color: #fed7aa; }
+    .status.err { background: #fef2f2; color: var(--err); border-color: #fecaca; }
+    .hint { font-size: .88rem; color: var(--muted); margin-top: 6px; }
+    .list {
+      max-height: 340px; overflow: auto; border: 1px solid var(--line); border-radius: 16px; background: #fff;
+    }
+    .item {
+      padding: 12px 12px; border-bottom: 1px solid var(--line); cursor: pointer;
+    }
+    .item:last-child { border-bottom: 0; }
+    .item:hover, .item.active { background: #eff6ff; }
+    .item-title { font-weight: 700; margin-bottom: 4px; }
+    .meta { font-size: .86rem; color: var(--muted); }
+    .barcode-box {
+      padding: 14px; border: 1px dashed #94a3b8; border-radius: 18px; background: #fff; text-align: center;
+      min-height: 220px; display: flex; flex-direction: column; justify-content: center; gap: 10px;
+    }
+    #barcodeSvg { width: 100%; height: auto; min-height: 110px; }
+    .code-text { font-size: 1rem; font-weight: 800; letter-spacing: .12em; }
+    .muted { color: var(--muted); }
+    .small { font-size: .85rem; }
+    .sticky-note {
+      margin-top: 12px; padding: 12px; border-radius: 16px; background: #f8fafc; border: 1px solid var(--line);
+    }
+    details { border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; background: #fff; }
+    details + details { margin-top: 10px; }
+    summary { cursor: pointer; font-weight: 700; }
+    code { background: #f1f5f9; padding: 2px 6px; border-radius: 8px; }
+    .footer { margin-top: 16px; text-align: center; color: var(--muted); font-size: .85rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;">
+        <div>
+          <h1>แอพแปลงเลขเป็นบาร์โค้ด</h1>
+          <p>ออกแบบให้ใช้บน iPhone/Android ผ่าน Safari หรือ Chrome โดยประมวลผล CSV ภายในเครื่อง ไม่ส่งข้อมูลออกนอกเว็บแอพ</p>
+        </div>
+        <div id="appStatus" class="pill status warn">กำลังตรวจสอบสภาพแวดล้อม...</div>
+      </div>
+      <div class="sticky-note">
+        <div class="small"><strong>ข้อแนะนำ:</strong> อัปขึ้นเว็บแบบ <code>https://</code> แล้วเปิดจาก Safari/Chrome ตรง ๆ จะเสถียรกว่าเปิดไฟล์ .html จากแอปแชตหรือ Drive preview</div>
+      </div>
+    </div>
+
+    <div class="grid cols">
+      <section class="grid">
+        <div class="card">
+          <h2>1) นำเข้ารายการสินค้า</h2>
+          <div class="row">
+            <div>
+              <label for="csvFile">เลือกไฟล์ CSV / TXT / TSV</label>
+              <input id="csvFile" type="file" accept=".csv,.txt,.tsv,text/csv,text/plain">
+              <div class="hint">ถ้ามาจาก Excel ให้บันทึกเป็น <strong>CSV UTF-8</strong> ก่อน</div>
+            </div>
+            <div class="btns">
+              <button id="loadFileBtn" class="primary">นำเข้าจากไฟล์</button>
+              <button id="loadSampleBtn" class="secondary">โหลดข้อมูลตัวอย่าง</button>
+              <button id="clearDataBtn" class="danger">ล้างข้อมูลสินค้า</button>
+            </div>
+            <div>
+              <label for="rawText">หรือวางข้อความ CSV / TSV</label>
+              <textarea id="rawText" placeholder="ตัวอย่าง:\nรหัสสินค้า,ชื่อสินค้า,หน่วยนับ,บาร์โค้ด\n0105070,ฟาร์มเฮาท์ เกล็ดขนมปัง 200 ก. (1*12),ลังX12,90105070"></textarea>
+              <div class="btns" style="margin-top:10px;">
+                <button id="loadTextBtn" class="primary">นำเข้าจากข้อความ</button>
+                <button id="pasteSampleBtn" class="ghost">วางตัวอย่างลงช่องข้อความ</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>2) เลือกสินค้า</h2>
+          <div class="row">
+            <div class="row row2">
+              <div>
+                <label for="searchInput">ค้นหาสินค้า</label>
+                <input id="searchInput" type="search" placeholder="ค้นหาจากรหัส / ชื่อ / หน่วยนับ / บาร์โค้ด">
+              </div>
+              <div>
+                <label for="sortMode">เรียงลำดับ</label>
+                <select id="sortMode">
+                  <option value="code">รหัสสินค้า</option>
+                  <option value="name">ชื่อสินค้า</option>
+                  <option value="barcode">บาร์โค้ด</option>
+                </select>
+              </div>
+            </div>
+            <div id="countInfo" class="small muted">ยังไม่มีข้อมูลสินค้า</div>
+            <div id="productList" class="list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid">
+        <div class="card">
+          <h2>3) สร้างบาร์โค้ด</h2>
+          <div class="row">
+            <div class="row row2">
+              <div>
+                <label for="productCode">รหัสสินค้า</label>
+                <input id="productCode" type="text" placeholder="เช่น 0105070">
+              </div>
+              <div>
+                <label for="productUnit">หน่วยนับ</label>
+                <input id="productUnit" type="text" placeholder="เช่น ลังX12">
+              </div>
+            </div>
+            <div>
+              <label for="productName">ชื่อสินค้า</label>
+              <input id="productName" type="text" placeholder="ชื่อสินค้า">
+            </div>
+            <div class="row row2">
+              <div>
+                <label for="barcodeValue">เลขสำหรับสร้างบาร์โค้ด</label>
+                <input id="barcodeValue" type="text" inputmode="numeric" placeholder="เช่น 90105070">
+              </div>
+              <div>
+                <label for="barcodeType">ชนิดบาร์โค้ด</label>
+                <select id="barcodeType">
+                  <option value="auto">อัตโนมัติ</option>
+                  <option value="EAN8">EAN-8</option>
+                  <option value="EAN13">EAN-13</option>
+                  <option value="CODE128">CODE128</option>
+                </select>
+              </div>
+            </div>
+            <div class="btns">
+              <button id="useBarcodeBtn" class="secondary">ใช้เลขจากคอลัมน์บาร์โค้ด</button>
+              <button id="useCodeBtn" class="ghost">ใช้รหัสสินค้า</button>
+              <button id="generateBtn" class="primary">สร้างบาร์โค้ด</button>
+            </div>
+            <div id="renderNote" class="small muted">ระบบจะเลือกชนิดอัตโนมัติจากความยาวและรูปแบบตัวเลข</div>
+            <div class="barcode-box">
+              <svg id="barcodeSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" aria-label="barcode preview"></svg>
+              <div id="humanText" class="code-text">-</div>
+              <div id="selectedMeta" class="small muted">ยังไม่ได้เลือกสินค้า</div>
+            </div>
+            <div class="btns">
+              <button id="downloadPngBtn" class="secondary">ดาวน์โหลด PNG</button>
+              <button id="printBtn" class="ghost">พิมพ์ / บันทึก PDF</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>4) วิธีใช้งานบน iPhone</h2>
+          <details open>
+            <summary>เปิดเว็บแบบเสถียรที่สุด</summary>
+            <p class="hint">นำไฟล์ทั้งหมดอัปขึ้นเว็บที่มี <strong>HTTPS</strong> แล้วเปิดลิงก์จาก Safari หรือ Chrome โดยตรง ไม่เปิดผ่าน preview ในแอปแชตหรือ Drive</p>
+          </details>
+          <details>
+            <summary>Add to Home Screen</summary>
+            <p class="hint">ใน Safari กด Share แล้วเลือก <strong>Add to Home Screen</strong> เพื่อใช้เหมือนแอพ</p>
+          </details>
+          <details>
+            <summary>ข้อมูลอยู่ที่ไหน</summary>
+            <p class="hint">ข้อมูลสินค้าจะถูกเก็บไว้ในเบราว์เซอร์ของเครื่องนี้เท่านั้นผ่าน localStorage ถ้าเปลี่ยนโดเมนหรือล้างข้อมูลเว็บ รายการจะหาย</p>
+          </details>
+        </div>
+      </section>
+    </div>
+
+    <div class="footer">Static web app | client-side only | no external API</div>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  var SAMPLE_TEXT = [
+    'รหัสสินค้า,ชื่อสินค้า,หน่วยนับ,บาร์โค้ด',
+    '0105070,ฟาร์มเฮาท์ เกล็ดขนมปัง 200 ก. (1*12),ลังX12,90105070',
+    '106031,ปลาแฟนซี แป้งข้าวเหนียวดำ 500 ก. (1*20),ลังX20,90106031',
+    '0106035,ช้างเหยียบระฆัง แป้งข้าวจ้าว 400 ก. (1*20),มัดX20,90106035',
+    '0106036,ช้างเหยียบระฆัง แป้งข้าวเหนียว 400 ก. (1*20),มัดX20,90106036',
+    '0106037,ช้างเหยียบระฆัง แป้งข้าวจ้าว 900 ก. (1*10),มัดx10,90106037',
+    '0110015,ธงแดงคู่จี้แซ ซีอิ๊วดำหวาน 300 มล. เล็ก (1*12),ลังX12,90110015',
+    '0129012,มิตรผล น้ำตาลทรายขาว 1 กก. แถบเขียว(1*25),ลูกx25,90129012',
+    '0131001,วันเฉลิม น้ำมะนาว ขวด 500 มล. (1*12),แพ็คX12,90131001',
+    '0201015,จัสมิน ข้าวหอมกรุ่น 5 กก. (1*6),ลูกx6,90201015',
+    '0303001,วินเนอร์ เงาะ กป. 565 ก. (1*24),ลังX24,90303001',
+    '0408002,บวร น้ำดื่ม 600 มล. (1*12),แพ็คX12,90408002',
+    '0501002,โรตีกรอบยู โรตีกรอบ **ไม่รับคืน** (1*24),หิ้วx24,90501002',
+    '2002070,เบนเนท สบู่ก้อน 130 ก. ส้ม (1*6*12),ลังX72,92002070',
+    '3004001,ตราแมวแดง เชือกฟาง คละสี (1*18),มัดx18,93004001',
+    '4009136,TL-001 กล่องอาหาร 1 ช่อง (1*20*25),ลังX20,94009136',
+    '5001100,เชอร์แมน อาหารเปียก ซอง 85 ก. ทูน่าและแซลมอน ส้ม (1*4*12),ลังX48,95001100'
+  ].join('\n');
+
+  var state = {
+    products: [],
+    filtered: [],
+    selectedIndex: -1
+  };
+
+  var E = {
+    appStatus: document.getElementById('appStatus'),
+    csvFile: document.getElementById('csvFile'),
+    loadFileBtn: document.getElementById('loadFileBtn'),
+    loadSampleBtn: document.getElementById('loadSampleBtn'),
+    clearDataBtn: document.getElementById('clearDataBtn'),
+    rawText: document.getElementById('rawText'),
+    loadTextBtn: document.getElementById('loadTextBtn'),
+    pasteSampleBtn: document.getElementById('pasteSampleBtn'),
+    searchInput: document.getElementById('searchInput'),
+    sortMode: document.getElementById('sortMode'),
+    countInfo: document.getElementById('countInfo'),
+    productList: document.getElementById('productList'),
+    productCode: document.getElementById('productCode'),
+    productUnit: document.getElementById('productUnit'),
+    productName: document.getElementById('productName'),
+    barcodeValue: document.getElementById('barcodeValue'),
+    barcodeType: document.getElementById('barcodeType'),
+    useBarcodeBtn: document.getElementById('useBarcodeBtn'),
+    useCodeBtn: document.getElementById('useCodeBtn'),
+    generateBtn: document.getElementById('generateBtn'),
+    renderNote: document.getElementById('renderNote'),
+    barcodeSvg: document.getElementById('barcodeSvg'),
+    humanText: document.getElementById('humanText'),
+    selectedMeta: document.getElementById('selectedMeta'),
+    downloadPngBtn: document.getElementById('downloadPngBtn'),
+    printBtn: document.getElementById('printBtn')
+  };
+
+  function setStatus(kind, text) {
+    E.appStatus.className = 'pill status ' + kind;
+    E.appStatus.textContent = text;
+  }
+
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, function (m) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
+    });
+  }
+
+  function saveProducts() {
+    try {
+      localStorage.setItem('barcodeProducts', JSON.stringify(state.products));
+    } catch (err) {}
+  }
+
+  function loadProducts() {
+    try {
+      var raw = localStorage.getItem('barcodeProducts');
+      if (!raw) return false;
+      var arr = JSON.parse(raw);
+      if (!arr || !arr.length) return false;
+      state.products = arr;
+      filterAndRender();
+      setStatus('ok', 'พร้อมใช้งาน');
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  function normalizeKey(s) {
+    return String(s || '').replace(/\s+/g, '').trim().toLowerCase();
+  }
+
+  function detectDelimiter(text) {
+    var sample = (text || '').split(/\r?\n/).slice(0, 5).join('\n');
+    if (sample.indexOf('\t') >= 0) return '\t';
+    var commaCount = (sample.match(/,/g) || []).length;
+    var semiCount = (sample.match(/;/g) || []).length;
+    if (semiCount > commaCount) return ';';
+    if (commaCount > 0) return ',';
+    return 'spaces';
+  }
+
+  function splitRow(row, delimiter) {
+    if (delimiter === 'spaces') {
+      return row.trim().split(/\s{2,}/);
+    }
+    var out = [];
+    var cur = '';
+    var q = false;
+    var i;
+    for (i = 0; i < row.length; i++) {
+      var ch = row.charAt(i);
+      if (ch === '"') {
+        if (q && row.charAt(i + 1) === '"') {
+          cur += '"';
+          i++;
+        } else {
+          q = !q;
+        }
+      } else if (ch === delimiter && !q) {
+        out.push(cur);
+        cur = '';
+      } else {
+        cur += ch;
+      }
+    }
+    out.push(cur);
+    return out;
+  }
+
+  function parseText(text) {
+    var clean = String(text || '').replace(/^\uFEFF/, '').trim();
+    if (!clean) throw new Error('ไม่พบข้อความสำหรับนำเข้า');
+    var lines = clean.split(/\r?\n/).filter(function (x) { return x.trim(); });
+    if (!lines.length) throw new Error('ไม่พบบรรทัดข้อมูล');
+    var delimiter = detectDelimiter(clean);
+    var headers = splitRow(lines[0], delimiter).map(function (x) { return x.trim(); });
+    var keyMap = {};
+    headers.forEach(function (h, i) { keyMap[normalizeKey(h)] = i; });
+
+    function pickIndex(options, fallback) {
+      var i;
+      for (i = 0; i < options.length; i++) {
+        if (typeof keyMap[normalizeKey(options[i])] !== 'undefined') return keyMap[normalizeKey(options[i])];
+      }
+      return fallback;
+    }
+
+    var idxCode = pickIndex(['รหัสสินค้า', 'รหัส', 'productcode', 'sku', 'code'], 0);
+    var idxName = pickIndex(['ชื่อสินค้า', 'ชื่อ', 'productname', 'name'], 1);
+    var idxUnit = pickIndex(['หน่วยนับ', 'หน่วย', 'unit'], 2);
+    var idxBarcode = pickIndex(['บาร์โค้ด', 'barcode', 'ean', 'ean8', 'ean13'], 3);
+
+    var rows = [];
+    var startAt = 1;
+    if (headers.length < 2 || (normalizeKey(headers[0]) && !isNaN(Number(headers[0])))) {
+      startAt = 0;
+    }
+
+    var i;
+    for (i = startAt; i < lines.length; i++) {
+      var cols = splitRow(lines[i], delimiter).map(function (x) { return x.trim(); });
+      if (cols.length === 1 && delimiter !== 'spaces') {
+        cols = lines[i].trim().split(/\s{2,}/);
+      }
+      if (!cols.length) continue;
+      var row = {
+        code: cols[idxCode] || '',
+        name: cols[idxName] || '',
+        unit: cols[idxUnit] || '',
+        barcode: cols[idxBarcode] || ''
+      };
+      if (row.code || row.name || row.barcode) rows.push(row);
+    }
+    if (!rows.length) throw new Error('อ่านข้อมูลได้ แต่ไม่พบรายการสินค้า');
+    return rows;
+  }
+
+  function importProducts(text) {
+    var rows = parseText(text);
+    state.products = rows;
+    state.selectedIndex = -1;
+    saveProducts();
+    filterAndRender();
+    setStatus('ok', 'พร้อมใช้งาน');
+    alert('นำเข้ารายการสินค้าแล้ว ' + rows.length + ' รายการ');
+  }
+
+  function sortRows(rows) {
+    var mode = E.sortMode.value;
+    rows.sort(function (a, b) {
+      var av = String(a[mode === 'name' ? 'name' : mode === 'barcode' ? 'barcode' : 'code'] || '');
+      var bv = String(b[mode === 'name' ? 'name' : mode === 'barcode' ? 'barcode' : 'code'] || '');
+      return av.localeCompare(bv, 'th');
+    });
+  }
+
+  function filterAndRender() {
+    var q = E.searchInput.value.trim().toLowerCase();
+    var rows = state.products.slice();
+    if (q) {
+      rows = rows.filter(function (p) {
+        return [p.code, p.name, p.unit, p.barcode].join(' ').toLowerCase().indexOf(q) >= 0;
+      });
+    }
+    sortRows(rows);
+    state.filtered = rows;
+    E.countInfo.textContent = rows.length ? ('พบ ' + rows.length + ' รายการ') : 'ยังไม่มีข้อมูลสินค้า';
+    renderProductList();
+  }
+
+  function renderProductList() {
+    if (!state.filtered.length) {
+      E.productList.innerHTML = '<div class="item"><div class="meta">ยังไม่มีรายการสินค้า ลองโหลดข้อมูลตัวอย่างหรืออัปโหลด CSV</div></div>';
+      return;
+    }
+    var html = state.filtered.map(function (p, i) {
+      return '<div class="item' + (i === state.selectedIndex ? ' active' : '') + '" data-index="' + i + '">' +
+        '<div class="item-title">' + escapeHtml(p.name || '-') + '</div>' +
+        '<div class="meta">รหัส: ' + escapeHtml(p.code || '-') + ' | หน่วย: ' + escapeHtml(p.unit || '-') + ' | บาร์โค้ด: ' + escapeHtml(p.barcode || '-') + '</div>' +
+        '</div>';
+    }).join('');
+    E.productList.innerHTML = html;
+  }
+
+  function chooseProduct(index) {
+    var p = state.filtered[index];
+    if (!p) return;
+    state.selectedIndex = index;
+    E.productCode.value = p.code || '';
+    E.productName.value = p.name || '';
+    E.productUnit.value = p.unit || '';
+    E.barcodeValue.value = p.barcode || p.code || '';
+    E.selectedMeta.textContent = [p.code || '-', p.name || '-', p.unit || '-', 'BC: ' + (p.barcode || '-')].join(' | ');
+    renderProductList();
+  }
+
+  function calcEANCheckDigit(digits) {
+    var sum = 0;
+    var i;
+    for (i = 0; i < digits.length; i++) {
+      var n = Number(digits.charAt(i));
+      sum += n * ((digits.length - i) % 2 === 0 ? 3 : 1);
+    }
+    return (10 - (sum % 10)) % 10;
+  }
+
+  var L = ['0001101','0011001','0010011','0111101','0100011','0110001','0101111','0111011','0110111','0001011'];
+  var G = ['0100111','0110011','0011011','0100001','0011101','0111001','0000101','0010001','0001001','0010111'];
+  var R = ['1110010','1100110','1101100','1000010','1011100','1001110','1010000','1000100','1001000','1110100'];
+  var PARITY13 = ['LLLLLL','LLGLGG','LLGGLG','LLGGGL','LGLLGG','LGGLLG','LGGGLL','LGLGLG','LGLGGL','LGGLGL'];
+
+  function buildEAN8(value) {
+    var digits = String(value).replace(/\D/g, '');
+    if (digits.length === 7) digits += String(calcEANCheckDigit(digits));
+    if (digits.length !== 8) throw new Error('EAN-8 ต้องมี 7 หรือ 8 หลัก');
+    var left = digits.slice(0, 4).split('').map(function (d) { return L[Number(d)]; }).join('');
+    var right = digits.slice(4).split('').map(function (d) { return R[Number(d)]; }).join('');
+    return { bits: '101' + left + '01010' + right + '101', text: digits, type: 'EAN-8' };
+  }
+
+  function buildEAN13(value) {
+    var digits = String(value).replace(/\D/g, '');
+    if (digits.length === 12) digits += String(calcEANCheckDigit(digits));
+    if (digits.length !== 13) throw new Error('EAN-13 ต้องมี 12 หรือ 13 หลัก');
+    var first = Number(digits.charAt(0));
+    var parity = PARITY13[first];
+    var leftBits = '';
+    var i;
+    for (i = 1; i <= 6; i++) {
+      var dig = Number(digits.charAt(i));
+      leftBits += parity.charAt(i - 1) === 'L' ? L[dig] : G[dig];
+    }
+    var rightBits = '';
+    for (i = 7; i < 13; i++) rightBits += R[Number(digits.charAt(i))];
+    return { bits: '101' + leftBits + '01010' + rightBits + '101', text: digits, type: 'EAN-13' };
+  }
+
+  var CODE128 = [
+    '11011001100','11001101100','11001100110','10010011000','10010001100','10001001100','10011001000','10011000100','10001100100','11001001000',
+    '11001000100','11000100100','10110011100','10011011100','10011001110','10111001100','10011101100','10011100110','11001110010','11001011100',
+    '11001001110','11011100100','11001110100','11101101110','11101001100','11100101100','11100100110','11101100100','11100110100','11100110010',
+    '11011011000','11011000110','11000110110','10100011000','10001011000','10001000110','10110001000','10001101000','10001100010','11010001000',
+    '11000101000','11000100010','10110111000','10110001110','10001101110','10111011000','10111000110','10001110110','11101110110','11010001110',
+    '11000101110','11011101000','11011100010','11011101110','11101011000','11101000110','11100010110','11101101000','11101100010','11100011010',
+    '11101111010','11001000010','11110001010','10100110000','10100001100','10010110000','10010000110','10000101100','10000100110','10110010000',
+    '10110000100','10011010000','10011000010','10000110100','10000110010','11000010010','11001010000','11110111010','11000010100','10001111010',
+    '10100111100','10010111100','10010011110','10111100100','10011110100','10011110010','11110100100','11110010100','11110010010','11011011110',
+    '11011110110','11110110110','10101111000','10100011110','10001011110','10111101000','10111100010','11110101000','11110100010','10111011110',
+    '10111101110','11101011110','11110101110','11010000100','11010010000','11010011100','1100011101011'
+  ];
+
+  function buildCode128(value) {
+    var s = String(value);
+    var codes = [];
+    var checksum;
+    var i;
+    if (/^\d+$/.test(s) && s.length >= 2 && s.length % 2 === 0) {
+      codes.push(105);
+      for (i = 0; i < s.length; i += 2) codes.push(Number(s.substr(i, 2)));
+    } else {
+      codes.push(104);
+      for (i = 0; i < s.length; i++) {
+        var code = s.charCodeAt(i) - 32;
+        if (code < 0 || code > 95) throw new Error('CODE128 รองรับอักขระพื้นฐาน ASCII');
+        codes.push(code);
+      }
+    }
+    checksum = codes[0];
+    for (i = 1; i < codes.length; i++) checksum += codes[i] * i;
+    checksum = checksum % 103;
+    codes.push(checksum);
+    codes.push(106);
+    return {
+      bits: codes.map(function (c) { return CODE128[c]; }).join(''),
+      text: s,
+      type: 'CODE128'
+    };
+  }
+
+  function autoType(value) {
+    var digits = String(value).replace(/\D/g, '');
+    if (/^\d{7,8}$/.test(digits)) return 'EAN8';
+    if (/^\d{12,13}$/.test(digits)) return 'EAN13';
+    return 'CODE128';
+  }
+
+  function buildBarcode(value, forcedType) {
+    var type = forcedType === 'auto' ? autoType(value) : forcedType;
+    if (type === 'EAN8') return buildEAN8(value);
+    if (type === 'EAN13') return buildEAN13(value);
+    return buildCode128(value);
+  }
+
+  function renderSvg(data) {
+    var bits = data.bits;
+    var quiet = 10;
+    var barW = Math.max(1, Math.floor(280 / bits.length));
+    var width = bits.length * barW + quiet * 2;
+    var height = 110;
+    var x = quiet;
+    var parts = ['<rect width="100%" height="100%" fill="#fff"/>'];
+    var i;
+    for (i = 0; i < bits.length; i++) {
+      if (bits.charAt(i) === '1') {
+        parts.push('<rect x="' + x + '" y="8" width="' + barW + '" height="88" fill="#000"/>');
+      }
+      x += barW;
+    }
+    parts.push('<text x="50%" y="128" text-anchor="middle" font-size="15" font-family="Arial, sans-serif">' + escapeHtml(data.text) + '</text>');
+    E.barcodeSvg.setAttribute('viewBox', '0 0 ' + width + ' 140');
+    E.barcodeSvg.innerHTML = parts.join('');
+    E.humanText.textContent = data.text;
+    E.renderNote.textContent = 'ชนิดที่ใช้: ' + data.type;
+  }
+
+  function generate() {
+    try {
+      var value = E.barcodeValue.value.trim();
+      if (!value) throw new Error('กรุณากรอกเลขสำหรับสร้างบาร์โค้ด');
+      var data = buildBarcode(value, E.barcodeType.value);
+      renderSvg(data);
+    } catch (err) {
+      alert(err.message || String(err));
+    }
+  }
+
+  function svgToPngDownload() {
+    var svg = E.barcodeSvg;
+    if (!svg.innerHTML) return alert('กรุณาสร้างบาร์โค้ดก่อน');
+    var xml = new XMLSerializer().serializeToString(svg);
+    var img = new Image();
+    var blob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    img.onload = function () {
+      var canvas = document.createElement('canvas');
+      canvas.width = svg.viewBox.baseVal.width || 640;
+      canvas.height = svg.viewBox.baseVal.height || 280;
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      var a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = 'barcode.png';
+      a.click();
+    };
+    img.src = url;
+  }
+
+  function printBarcode() {
+    window.print();
+  }
+
+  function bindEvents() {
+    E.loadFileBtn.onclick = function () {
+      var file = E.csvFile.files && E.csvFile.files[0];
+      if (!file) return alert('กรุณาเลือกไฟล์ก่อน');
+      if (/\.xlsx$/i.test(file.name)) return alert('ไฟล์ .xlsx ใช้ไม่ได้โดยตรง กรุณา Save As เป็น CSV UTF-8 ก่อน');
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        try { importProducts(e.target.result || ''); }
+        catch (err) { alert(err.message || String(err)); }
+      };
+      reader.onerror = function () { alert('อ่านไฟล์ไม่สำเร็จ'); };
+      reader.readAsText(file, 'utf-8');
+    };
+
+    E.loadSampleBtn.onclick = function () { importProducts(SAMPLE_TEXT); };
+    E.clearDataBtn.onclick = function () {
+      state.products = [];
+      state.filtered = [];
+      state.selectedIndex = -1;
+      localStorage.removeItem('barcodeProducts');
+      filterAndRender();
+      E.selectedMeta.textContent = 'ยังไม่ได้เลือกสินค้า';
+      alert('ล้างข้อมูลสินค้าแล้ว');
+    };
+    E.loadTextBtn.onclick = function () {
+      try { importProducts(E.rawText.value); }
+      catch (err) { alert(err.message || String(err)); }
+    };
+    E.pasteSampleBtn.onclick = function () { E.rawText.value = SAMPLE_TEXT; };
+    E.searchInput.oninput = filterAndRender;
+    E.sortMode.onchange = filterAndRender;
+    E.productList.onclick = function (evt) {
+      var el = evt.target;
+      while (el && !el.getAttribute('data-index')) el = el.parentNode;
+      if (!el) return;
+      chooseProduct(Number(el.getAttribute('data-index')));
+    };
+    E.useBarcodeBtn.onclick = function () {
+      E.barcodeValue.value = E.barcodeValue.value || E.productCode.value;
+      if (!E.barcodeValue.value && state.selectedIndex >= 0) {
+        var p = state.filtered[state.selectedIndex];
+        E.barcodeValue.value = p.barcode || p.code || '';
+      }
+      generate();
+    };
+    E.useCodeBtn.onclick = function () {
+      E.barcodeValue.value = E.productCode.value.trim();
+      generate();
+    };
+    E.generateBtn.onclick = generate;
+    E.downloadPngBtn.onclick = svgToPngDownload;
+    E.printBtn.onclick = printBarcode;
+  }
+
+  function init() {
+    bindEvents();
+    setStatus('ok', 'พร้อมใช้งาน');
+    if (!loadProducts()) {
+      E.rawText.value = SAMPLE_TEXT;
+      filterAndRender();
+    }
+    try {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(function () {});
+      }
+    } catch (err) {}
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
