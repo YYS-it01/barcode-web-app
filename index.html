@@ -1,707 +1,1317 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0f172a">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>Barcode Mobile Web App</title>
-  <link rel="manifest" href="manifest.webmanifest">
-  <style>
-    :root {
-      --bg: #f8fafc;
-      --card: #ffffff;
-      --ink: #0f172a;
-      --muted: #475569;
-      --line: #e2e8f0;
-      --brand: #2563eb;
-      --ok: #166534;
-      --warn: #b45309;
-      --err: #b91c1c;
-      --shadow: 0 8px 24px rgba(15,23,42,.08);
-      --radius: 18px;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: linear-gradient(180deg, #eff6ff 0%, var(--bg) 220px);
-      color: var(--ink);
-    }
-    .wrap { max-width: 980px; margin: 0 auto; padding: 16px 14px 40px; }
-    .hero, .card {
-      background: var(--card);
-      border: 1px solid rgba(226,232,240,.9);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
-    .hero { padding: 18px; margin-bottom: 14px; }
-    h1 { margin: 0 0 8px; font-size: 1.45rem; }
-    h2 { margin: 0 0 10px; font-size: 1.05rem; }
-    p { margin: 0; color: var(--muted); line-height: 1.5; }
-    .grid { display: grid; gap: 14px; }
-    .cols { grid-template-columns: 1fr; }
-    @media (min-width: 900px) { .cols { grid-template-columns: 1.1fr .9fr; } }
-    .card { padding: 16px; }
-    .row { display: grid; gap: 10px; }
-    .row2 { grid-template-columns: 1fr 1fr; }
-    .row3 { grid-template-columns: repeat(3, 1fr); }
-    @media (max-width: 680px) { .row2, .row3 { grid-template-columns: 1fr; } }
-    label { display: block; font-size: .92rem; font-weight: 700; margin-bottom: 6px; }
-    input[type="text"], input[type="search"], input[type="number"], select, textarea {
-      width: 100%; padding: 12px 13px; border-radius: 14px; border: 1px solid #cbd5e1;
-      background: #fff; font-size: 16px; color: var(--ink);
-    }
-    textarea { min-height: 150px; resize: vertical; }
-    .btns { display: flex; flex-wrap: wrap; gap: 10px; }
-    button, .btn {
-      appearance: none; border: 0; border-radius: 14px; padding: 12px 14px; font-size: 15px;
-      font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
-    }
-    .primary { background: var(--brand); color: #fff; }
-    .secondary { background: #e2e8f0; color: var(--ink); }
-    .ghost { background: #fff; color: var(--ink); border: 1px solid #cbd5e1; }
-    .danger { background: #fee2e2; color: #991b1b; }
-    .pill {
-      display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; font-size: .88rem;
-      background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
-    }
-    .status.ok { background: #ecfdf5; color: var(--ok); border-color: #bbf7d0; }
-    .status.warn { background: #fff7ed; color: var(--warn); border-color: #fed7aa; }
-    .status.err { background: #fef2f2; color: var(--err); border-color: #fecaca; }
-    .hint { font-size: .88rem; color: var(--muted); margin-top: 6px; }
-    .list {
-      max-height: 340px; overflow: auto; border: 1px solid var(--line); border-radius: 16px; background: #fff;
-    }
-    .item {
-      padding: 12px 12px; border-bottom: 1px solid var(--line); cursor: pointer;
-    }
-    .item:last-child { border-bottom: 0; }
-    .item:hover, .item.active { background: #eff6ff; }
-    .item-title { font-weight: 700; margin-bottom: 4px; }
-    .meta { font-size: .86rem; color: var(--muted); }
-    .barcode-box {
-      padding: 14px; border: 1px dashed #94a3b8; border-radius: 18px; background: #fff; text-align: center;
-      min-height: 220px; display: flex; flex-direction: column; justify-content: center; gap: 10px;
-    }
-    #barcodeSvg { width: 100%; height: auto; min-height: 110px; }
-    .code-text { font-size: 1rem; font-weight: 800; letter-spacing: .12em; }
-    .muted { color: var(--muted); }
-    .small { font-size: .85rem; }
-    .sticky-note {
-      margin-top: 12px; padding: 12px; border-radius: 16px; background: #f8fafc; border: 1px solid var(--line);
-    }
-    details { border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; background: #fff; }
-    details + details { margin-top: 10px; }
-    summary { cursor: pointer; font-weight: 700; }
-    code { background: #f1f5f9; padding: 2px 6px; border-radius: 8px; }
-    .footer { margin-top: 16px; text-align: center; color: var(--muted); font-size: .85rem; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2563eb">
+<title>แอพบาร์โค้ดสินค้า v3</title>
+<style>
+:root {
+  --bg: #f4f7fb;
+  --card: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --line: #dbe5f1;
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --soft: #eff6ff;
+  --good-bg: #ecfdf5;
+  --good-line: #a7f3d0;
+  --good-text: #166534;
+  --bad-bg: #fff1f2;
+  --bad-line: #fecdd3;
+  --bad-text: #9f1239;
+  --shadow: 0 10px 26px rgba(15,23,42,.08);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin:0; padding:0; background:var(--bg); color:var(--text); }
+body { min-height:100vh; }
+.wrap { max-width: 980px; margin: 0 auto; padding: 14px 12px 28px; }
+.hero {
+  background: linear-gradient(135deg, #1d4ed8, #2563eb 55%, #60a5fa);
+  color: #fff;
+  border-radius: 22px;
+  padding: 18px 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 14px;
+}
+.hero h1 { margin:0 0 8px; font-size: 1.5rem; }
+.hero p { margin:0; line-height:1.55; }
+.badges { margin-top: 12px; display:flex; gap:8px; flex-wrap:wrap; }
+.badges span {
+  display:inline-block; padding:6px 10px; border-radius:999px;
+  background: rgba(255,255,255,.18); font-size:.9rem;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: var(--shadow);
+  margin-bottom: 14px;
+}
+.card h2 { margin: 0 0 12px; font-size: 1.08rem; }
+.row, .toolbar { display:flex; gap:10px; flex-wrap:wrap; }
+.grid2 { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:12px; }
+label { display:block; font-weight:700; margin-bottom:8px; }
+.small { color: var(--muted); font-size: .93rem; line-height:1.5; }
+input, select, textarea, button {
+  font: inherit;
+}
+input[type=text], input[type=search], select, textarea, input[type=file] {
+  width:100%; padding:12px 13px; border:1px solid var(--line); border-radius:14px; background:#fff; color:var(--text);
+}
+textarea { min-height: 150px; resize: vertical; }
+button {
+  border:1px solid transparent; border-radius:14px; padding:11px 14px; cursor:pointer;
+  background:#eef2ff; color:var(--text); font-weight:700;
+}
+button.primary { background: var(--primary); color:#fff; }
+button.primary:active { background: var(--primary-dark); }
+button.soft { background: var(--soft); color: var(--primary-dark); }
+button.danger { background: #fee2e2; color: #b91c1c; }
+.notice {
+  border:1px solid var(--good-line); background:var(--good-bg); color:var(--good-text);
+  border-radius:14px; padding:11px 12px; line-height:1.5; margin-top:10px;
+}
+.notice.error {
+  border-color:var(--bad-line); background:var(--bad-bg); color:var(--bad-text);
+}
+.stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin-top:10px; }
+.stat {
+  background:#f8fbff; border:1px solid var(--line); border-radius:14px; padding:12px;
+}
+.stat .k { color:var(--muted); display:block; font-size:.84rem; margin-bottom:4px; }
+.status-chip {
+  display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; background:#fde68a; color:#92400e;
+}
+.status-chip.ok { background:#bbf7d0; color:#166534; }
+.status-chip.bad { background:#fecdd3; color:#9f1239; }
+.product-list {
+  display:grid; gap:10px; max-height: 420px; overflow-y:auto; padding-right:2px;
+}
+.product-btn {
+  width:100%; text-align:left; border:1px solid var(--line); border-radius:14px; padding:12px; background:#fff;
+}
+.product-btn.active { border-color:#93c5fd; background:#eff6ff; }
+.pname { font-weight:800; margin-bottom:6px; line-height:1.4; }
+.pmeta { color:var(--muted); font-size:.92rem; line-height:1.55; }
+.empty {
+  border:1px dashed var(--line); border-radius:14px; padding:18px 12px; text-align:center; color:var(--muted); background:#fafcff;
+}
+.preview {
+  border:1px dashed var(--line); border-radius:16px; background:#fbfdff; padding:14px;
+}
+.preview-title { font-weight:800; margin-bottom:8px; line-height:1.4; }
+.preview-lines { color:var(--muted); font-size:.94rem; line-height:1.55; margin-bottom:10px; }
+.canvas-wrap { overflow-x:auto; }
+canvas {
+  display:block; margin:0 auto; background:#fff; border-radius:12px; box-shadow: inset 0 0 0 1px #eef2f7;
+}
+.help-box {
+  border-left:4px solid #60a5fa; background:#f8fbff; padding:12px; border-radius:10px;
+}
+.footer { text-align:center; color:var(--muted); font-size:.9rem; line-height:1.55; padding: 0 6px 16px; }
+noscript .fallback, .js-only-hidden { display:none; }
+@media (max-width: 640px) {
+  .wrap { padding:12px 10px 26px; }
+  .card { padding: 13px; }
+  .toolbar button { width: 100%; }
+}
+@media print {
+  body { background:#fff; }
+  .hero, #importCard, #searchCard, #toolsRow, #footer, .small, .notice { display:none !important; }
+  .card { box-shadow:none; border:none; padding:0; margin:0 0 10px; }
+  .preview { border:none; padding:0; background:#fff; }
+  canvas { box-shadow:none; }
+}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="hero">
-      <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;">
-        <div>
-          <h1>แอพแปลงเลขเป็นบาร์โค้ด</h1>
-          <p>ออกแบบให้ใช้บน iPhone/Android ผ่าน Safari หรือ Chrome โดยประมวลผล CSV ภายในเครื่อง ไม่ส่งข้อมูลออกนอกเว็บแอพ</p>
-        </div>
-        <div id="appStatus" class="pill status warn">กำลังตรวจสอบสภาพแวดล้อม...</div>
+<main class="wrap">
+  <section class="hero">
+    <h1>แอพบาร์โค้ดสินค้า</h1>
+    <p>เลือกสินค้าได้จากรายการ, นำเข้าข้อมูลจากไฟล์ CSV/TXT หรือวางข้อความ 4 คอลัมน์, แล้วสร้างบาร์โค้ดบนโทรศัพท์ได้ทันที</p>
+    <div class="badges">
+      <span>เหมาะกับมือถือ</span>
+      <span>รองรับ CSV / TSV / TXT</span>
+      <span>ใช้แบบออฟไลน์ได้</span>
+      <span>ดาวน์โหลด PNG ได้</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>สถานะการทำงาน</h2>
+    <div class="row">
+      <div class="status-chip" id="appStatus">กำลังโหลดสคริปต์...</div>
+    </div>
+    <div class="small" style="margin-top:8px;">ถ้าข้อความนี้ไม่เปลี่ยนเป็น “พร้อมใช้งาน” แปลว่าไฟล์ถูกเปิดด้วยตัวพรีวิวที่ไม่รองรับการกดปุ่ม/พิมพ์ข้อความ ให้เปิดด้วย Safari หรือ Chrome แทน</div>
+    <div id="runtimeMessage" class="notice">กำลังเริ่มต้นแอพ...</div>
+  </section>
+
+  <section class="card" id="importCard">
+    <h2>1) นำเข้ารายการสินค้า</h2>
+    <label for="csvFile">เลือกไฟล์ CSV / TXT / TSV</label>
+    <input id="csvFile" type="file" accept=".csv,.txt,.tsv,text/csv,text/plain,text/tab-separated-values,application/csv,application/vnd.ms-excel">
+    <div class="small" style="margin-top:8px;">ไฟล์ Excel .xlsx ใช้ไม่ได้โดยตรง ต้อง Save As เป็น CSV UTF-8 ก่อน</div>
+
+    <div class="toolbar" style="margin-top:10px;">
+      <button type="button" class="soft" id="loadDemoBtn">โหลดข้อมูลตัวอย่าง</button>
+      <button type="button" id="downloadTemplateBtn">ดาวน์โหลดเทมเพลต CSV</button>
+      <button type="button" id="exportBtn">ส่งออกข้อมูลปัจจุบัน</button>
+      <button type="button" class="danger" id="clearSavedBtn">ล้างข้อมูลที่บันทึกไว้</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><span class="k">แหล่งข้อมูล</span><strong id="sourceText">-</strong></div>
+      <div class="stat"><span class="k">จำนวนสินค้า</span><strong id="countText">0</strong></div>
+    </div>
+
+    <div id="importNotice" class="notice">รองรับหัวคอลัมน์: รหัสสินค้า, ชื่อสินค้า, หน่วยนับ, บาร์โค้ด</div>
+
+    <div style="margin-top:12px;">
+      <label for="pasteBox">หรือวางข้อความตรงนี้</label>
+      <textarea id="pasteBox" placeholder="ตัวอย่าง
+รหัสสินค้า	ชื่อสินค้า	หน่วยนับ	บาร์โค้ด
+0105070	ฟาร์มเฮาท์ เกล็ดขนมปัง 200 ก. (1*12)	ลังX12	90105070"></textarea>
+      <div class="toolbar" style="margin-top:8px;">
+        <button type="button" class="primary" id="importTextBtn">นำเข้าจากข้อความ</button>
+        <button type="button" id="fillExampleBtn">ใส่ตัวอย่างลงช่องข้อความ</button>
+        <button type="button" id="clearTextBtn">ล้างข้อความ</button>
       </div>
-      <div class="sticky-note">
-        <div class="small"><strong>ข้อแนะนำ:</strong> อัปขึ้นเว็บแบบ <code>https://</code> แล้วเปิดจาก Safari/Chrome ตรง ๆ จะเสถียรกว่าเปิดไฟล์ .html จากแอปแชตหรือ Drive preview</div>
+    </div>
+  </section>
+
+  <section class="card" id="searchCard">
+    <h2>2) ค้นหาและกดเลือกสินค้า</h2>
+    <input id="searchBox" type="search" placeholder="ค้นหาด้วยรหัสสินค้า ชื่อสินค้า หน่วยนับ หรือบาร์โค้ด">
+    <div class="row" style="justify-content:space-between; margin:10px 0;">
+      <div class="small" id="resultCount">พบ 0 รายการ</div>
+      <button type="button" id="clearSearchBtn">ล้างคำค้น</button>
+    </div>
+    <div id="productList" class="product-list"></div>
+    <div id="selectedBox" class="empty" style="margin-top:12px;">ยังไม่ได้เลือกสินค้า</div>
+  </section>
+
+  <section class="card">
+    <h2>3) สร้างบาร์โค้ด</h2>
+    <div class="grid2">
+      <div>
+        <label for="barcodeValue">เลขที่จะสร้างบาร์โค้ด</label>
+        <input id="barcodeValue" type="text" inputmode="numeric" placeholder="เช่น 90105070">
+      </div>
+      <div>
+        <label for="formatSelect">รูปแบบบาร์โค้ด</label>
+        <select id="formatSelect">
+          <option value="CODE128">CODE128 (แนะนำ)</option>
+          <option value="EAN8">EAN-8</option>
+          <option value="EAN13">EAN-13</option>
+        </select>
       </div>
     </div>
 
-    <div class="grid cols">
-      <section class="grid">
-        <div class="card">
-          <h2>1) นำเข้ารายการสินค้า</h2>
-          <div class="row">
-            <div>
-              <label for="csvFile">เลือกไฟล์ CSV / TXT / TSV</label>
-              <input id="csvFile" type="file" accept=".csv,.txt,.tsv,text/csv,text/plain">
-              <div class="hint">ถ้ามาจาก Excel ให้บันทึกเป็น <strong>CSV UTF-8</strong> ก่อน</div>
-            </div>
-            <div class="btns">
-              <button id="loadFileBtn" class="primary">นำเข้าจากไฟล์</button>
-              <button id="loadSampleBtn" class="secondary">โหลดข้อมูลตัวอย่าง</button>
-              <button id="clearDataBtn" class="danger">ล้างข้อมูลสินค้า</button>
-            </div>
-            <div>
-              <label for="rawText">หรือวางข้อความ CSV / TSV</label>
-              <textarea id="rawText" placeholder="ตัวอย่าง:\nรหัสสินค้า,ชื่อสินค้า,หน่วยนับ,บาร์โค้ด\n0105070,ฟาร์มเฮาท์ เกล็ดขนมปัง 200 ก. (1*12),ลังX12,90105070"></textarea>
-              <div class="btns" style="margin-top:10px;">
-                <button id="loadTextBtn" class="primary">นำเข้าจากข้อความ</button>
-                <button id="pasteSampleBtn" class="ghost">วางตัวอย่างลงช่องข้อความ</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h2>2) เลือกสินค้า</h2>
-          <div class="row">
-            <div class="row row2">
-              <div>
-                <label for="searchInput">ค้นหาสินค้า</label>
-                <input id="searchInput" type="search" placeholder="ค้นหาจากรหัส / ชื่อ / หน่วยนับ / บาร์โค้ด">
-              </div>
-              <div>
-                <label for="sortMode">เรียงลำดับ</label>
-                <select id="sortMode">
-                  <option value="code">รหัสสินค้า</option>
-                  <option value="name">ชื่อสินค้า</option>
-                  <option value="barcode">บาร์โค้ด</option>
-                </select>
-              </div>
-            </div>
-            <div id="countInfo" class="small muted">ยังไม่มีข้อมูลสินค้า</div>
-            <div id="productList" class="list"></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="grid">
-        <div class="card">
-          <h2>3) สร้างบาร์โค้ด</h2>
-          <div class="row">
-            <div class="row row2">
-              <div>
-                <label for="productCode">รหัสสินค้า</label>
-                <input id="productCode" type="text" placeholder="เช่น 0105070">
-              </div>
-              <div>
-                <label for="productUnit">หน่วยนับ</label>
-                <input id="productUnit" type="text" placeholder="เช่น ลังX12">
-              </div>
-            </div>
-            <div>
-              <label for="productName">ชื่อสินค้า</label>
-              <input id="productName" type="text" placeholder="ชื่อสินค้า">
-            </div>
-            <div class="row row2">
-              <div>
-                <label for="barcodeValue">เลขสำหรับสร้างบาร์โค้ด</label>
-                <input id="barcodeValue" type="text" inputmode="numeric" placeholder="เช่น 90105070">
-              </div>
-              <div>
-                <label for="barcodeType">ชนิดบาร์โค้ด</label>
-                <select id="barcodeType">
-                  <option value="auto">อัตโนมัติ</option>
-                  <option value="EAN8">EAN-8</option>
-                  <option value="EAN13">EAN-13</option>
-                  <option value="CODE128">CODE128</option>
-                </select>
-              </div>
-            </div>
-            <div class="btns">
-              <button id="useBarcodeBtn" class="secondary">ใช้เลขจากคอลัมน์บาร์โค้ด</button>
-              <button id="useCodeBtn" class="ghost">ใช้รหัสสินค้า</button>
-              <button id="generateBtn" class="primary">สร้างบาร์โค้ด</button>
-            </div>
-            <div id="renderNote" class="small muted">ระบบจะเลือกชนิดอัตโนมัติจากความยาวและรูปแบบตัวเลข</div>
-            <div class="barcode-box">
-              <svg id="barcodeSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" aria-label="barcode preview"></svg>
-              <div id="humanText" class="code-text">-</div>
-              <div id="selectedMeta" class="small muted">ยังไม่ได้เลือกสินค้า</div>
-            </div>
-            <div class="btns">
-              <button id="downloadPngBtn" class="secondary">ดาวน์โหลด PNG</button>
-              <button id="printBtn" class="ghost">พิมพ์ / บันทึก PDF</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h2>4) วิธีใช้งานบน iPhone</h2>
-          <details open>
-            <summary>เปิดเว็บแบบเสถียรที่สุด</summary>
-            <p class="hint">นำไฟล์ทั้งหมดอัปขึ้นเว็บที่มี <strong>HTTPS</strong> แล้วเปิดลิงก์จาก Safari หรือ Chrome โดยตรง ไม่เปิดผ่าน preview ในแอปแชตหรือ Drive</p>
-          </details>
-          <details>
-            <summary>Add to Home Screen</summary>
-            <p class="hint">ใน Safari กด Share แล้วเลือก <strong>Add to Home Screen</strong> เพื่อใช้เหมือนแอพ</p>
-          </details>
-          <details>
-            <summary>ข้อมูลอยู่ที่ไหน</summary>
-            <p class="hint">ข้อมูลสินค้าจะถูกเก็บไว้ในเบราว์เซอร์ของเครื่องนี้เท่านั้นผ่าน localStorage ถ้าเปลี่ยนโดเมนหรือล้างข้อมูลเว็บ รายการจะหาย</p>
-          </details>
-        </div>
-      </section>
+    <div class="toolbar" id="toolsRow" style="margin-top:10px;">
+      <button type="button" class="soft" id="useBarcodeBtn">ใช้เลขจากคอลัมน์บาร์โค้ด</button>
+      <button type="button" class="soft" id="useCodeBtn">ใช้รหัสสินค้า</button>
+      <button type="button" class="primary" id="generateBtn">สร้างบาร์โค้ด</button>
+      <button type="button" id="downloadPngBtn">ดาวน์โหลด PNG</button>
+      <button type="button" id="copyBtn">คัดลอกเลข</button>
+      <button type="button" id="printBtn">พิมพ์ / บันทึก PDF</button>
     </div>
 
-    <div class="footer">Static web app | client-side only | no external API</div>
-  </div>
+    <div id="barcodeNotice" class="notice">เลือกสินค้าแล้วกด “ใช้เลขจากคอลัมน์บาร์โค้ด” หรือกรอกเลขเอง</div>
+
+    <div class="preview" style="margin-top:12px;">
+      <div class="preview-title" id="previewTitle">ตัวอย่างบาร์โค้ด</div>
+      <div class="preview-lines" id="previewLines">ยังไม่มีข้อมูล</div>
+      <div class="canvas-wrap">
+        <canvas id="barcodeCanvas" width="320" height="180"></canvas>
+      </div>
+      <div class="small" id="caption" style="text-align:center; margin-top:10px;">—</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>วิธีส่งไฟล์ไปยังโทรศัพท์และวิธีใช้</h2>
+    <div class="help-box">
+      <div><strong>วิธีส่งไฟล์ไปยังโทรศัพท์</strong></div>
+      <div class="small">
+        1) กดดาวน์โหลดไฟล์ HTML ลงเครื่องก่อน<br>
+        2) ย้ายไฟล์ไปที่แอป Files / ดาวน์โหลด / Google Drive / iCloud Drive<br>
+        3) เปิดไฟล์ด้วย <strong>Safari หรือ Chrome</strong> เท่านั้น ไม่ใช่หน้าพรีวิวในแชตหรือในแอปส่งไฟล์
+      </div>
+    </div>
+    <div class="help-box" style="margin-top:10px;">
+      <div><strong>วิธีใช้บนโทรศัพท์</strong></div>
+      <div class="small">
+        1) เปิดไฟล์ HTML นี้ใน Safari หรือ Chrome<br>
+        2) ดูที่หัวข้อ “สถานะการทำงาน” ต้องขึ้นว่า <strong>พร้อมใช้งาน</strong><br>
+        3) ถ้ามีไฟล์สินค้า ให้กดเลือกไฟล์ CSV/TXT แล้วรอข้อความ “นำเข้าสำเร็จ”<br>
+        4) ถ้าไม่มีไฟล์ ให้กด “ใส่ตัวอย่างลงช่องข้อความ” หรือวางข้อมูล 4 คอลัมน์ แล้วกด “นำเข้าจากข้อความ”<br>
+        5) ค้นหาสินค้า แล้วกดรายการสินค้าที่ต้องการ<br>
+        6) กด “ใช้เลขจากคอลัมน์บาร์โค้ด” แล้วกด “สร้างบาร์โค้ด”<br>
+        7) ต้องการรูป ให้กด “ดาวน์โหลด PNG” หรือกด “พิมพ์ / บันทึก PDF”
+      </div>
+    </div>
+    <div class="help-box" style="margin-top:10px;">
+      <div><strong>ถ้ายังพิมพ์หรือกดไม่ได้</strong></div>
+      <div class="small">
+        แปลว่าตอนนี้ยังเปิดผ่านตัวพรีวิว ไม่ใช่เบราว์เซอร์จริง ให้กด “แชร์” แล้วเลือก <strong>เปิดใน Safari</strong> หรือ <strong>เปิดใน Chrome</strong> ก่อน
+      </div>
+    </div>
+  </section>
+
+  <div class="footer" id="footer">เคล็ดลับ: ถ้าไฟล์มาจาก Excel ให้บันทึกเป็น CSV UTF-8 และตั้งคอลัมน์รหัส/บาร์โค้ดเป็นข้อความ เพื่อคงเลขศูนย์นำหน้าไว้</div>
+</main>
 
 <script>
-(function () {
-  'use strict';
-
-  var SAMPLE_TEXT = [
-    'รหัสสินค้า,ชื่อสินค้า,หน่วยนับ,บาร์โค้ด',
-    '0105070,ฟาร์มเฮาท์ เกล็ดขนมปัง 200 ก. (1*12),ลังX12,90105070',
-    '106031,ปลาแฟนซี แป้งข้าวเหนียวดำ 500 ก. (1*20),ลังX20,90106031',
-    '0106035,ช้างเหยียบระฆัง แป้งข้าวจ้าว 400 ก. (1*20),มัดX20,90106035',
-    '0106036,ช้างเหยียบระฆัง แป้งข้าวเหนียว 400 ก. (1*20),มัดX20,90106036',
-    '0106037,ช้างเหยียบระฆัง แป้งข้าวจ้าว 900 ก. (1*10),มัดx10,90106037',
-    '0110015,ธงแดงคู่จี้แซ ซีอิ๊วดำหวาน 300 มล. เล็ก (1*12),ลังX12,90110015',
-    '0129012,มิตรผล น้ำตาลทรายขาว 1 กก. แถบเขียว(1*25),ลูกx25,90129012',
-    '0131001,วันเฉลิม น้ำมะนาว ขวด 500 มล. (1*12),แพ็คX12,90131001',
-    '0201015,จัสมิน ข้าวหอมกรุ่น 5 กก. (1*6),ลูกx6,90201015',
-    '0303001,วินเนอร์ เงาะ กป. 565 ก. (1*24),ลังX24,90303001',
-    '0408002,บวร น้ำดื่ม 600 มล. (1*12),แพ็คX12,90408002',
-    '0501002,โรตีกรอบยู โรตีกรอบ **ไม่รับคืน** (1*24),หิ้วx24,90501002',
-    '2002070,เบนเนท สบู่ก้อน 130 ก. ส้ม (1*6*12),ลังX72,92002070',
-    '3004001,ตราแมวแดง เชือกฟาง คละสี (1*18),มัดx18,93004001',
-    '4009136,TL-001 กล่องอาหาร 1 ช่อง (1*20*25),ลังX20,94009136',
-    '5001100,เชอร์แมน อาหารเปียก ซอง 85 ก. ทูน่าและแซลมอน ส้ม (1*4*12),ลังX48,95001100'
-  ].join('\n');
+(function() {
+  var STORAGE_KEY = 'barcode_mobile_app_v3_products';
+  var STORAGE_META_KEY = 'barcode_mobile_app_v3_meta';
+  var DEMO_CSV = "รหัสสินค้า,ชื่อสินค้า,หน่วยนับ,บาร์โค้ด\n0105070,\"ฟาร์มเฮาท์ เกล็ดขนมปัง 200 ก. (1*12)\",ลังX12,90105070\n106031,\"ปลาแฟนซี แป้งข้าวเหนียวดำ 500 ก. (1*20)\",ลังX20,90106031\n0106035,\"ช้างเหยียบระฆัง แป้งข้าวจ้าว 400 ก. (1*20)\",มัดX20,90106035\n0106036,\"ช้างเหยียบระฆัง แป้งข้าวเหนียว 400 ก. (1*20)\",มัดX20,90106036\n0106037,\"ช้างเหยียบระฆัง แป้งข้าวจ้าว 900 ก. (1*10)\",มัดx10,90106037\n0106038,\"ช้างเหยียบระฆัง แป้งข้าวเหนียว 900 ก. (1*10)\",มัดx10,90106038\n0106041,\"ช้างชูระฆัง แป้งข้าวจ้าว 850 ก. (1*10)\",มัดx10,90106041\n0106042,\"ช้างชูระฆัง แป้งข้าวเหนียว 850 ก. (1*10)\",มัดx10,90106042\n0106058,\"ปลาไทย 5 ดาว แป้งมัน 30 กก.\",ลูกX30,90106058\n0106095,\"ยูยี แป้งกวนไส้ 450 ก (1*10*2)\",ลังX20,90106095\n0110015,\"ธงแดงคู่จี้แซ ซีอิ๊วดำหวาน 300 มล. เล็ก (1*12)\",ลังX12,90110015\n0110016,\"ธงแดงคู่จี้แซ ซีอิ๊วดำหวาน 630 มล. ใหญ่ (1*12)\",ลังX12,90110016\n0111005,\"ภูเขาทอง ซอสปรุงรสฝาเหลือง 110 มล. (1*12)\",ลังX12,90111005\n0111012,\"[SP]ฉลากทอง ซอสปรุงรสฉลากเขียว 700 มล. รุ่นแถมน้ำส้ม (1*12)\",ลังX12,90111012\n0113010,\"ธงแดงคู่จี้แซ เต้าเจี้ยว ขวดกลม 300 มล. (1*12)\",ลังX12,90113010\n0113011,\"ธงแดงคู่จี้แซ เต้าเจี้ยวพิเศษ ขวด (ปากน้ำโพ) 700 มล. (1*12)\",ลังX12,90113011\n0113020,\"ระฆัง เต้าหู้ยี้ กระปุกพลาสติก 2.7 กก (1*4)\",ลังX4,90113020\n0114004,\"ศุภวรรณ ซอสเย็นตาโฟ ขวด 750 ก. (1*6)\",แพ็คx6,90114004\n0116050,\"ศุภวรรณ น้ำจิ้มสุกี้ ขวด 750 ก. (1*6)\",แพ็คx6,90116050\n0126023,\"ฟ้าไทย ผงปรุงรสเจเห็ดหอม 165 ก.เหลือง (1*6*6)\",ลังX36,90126023\n0126025,\"ฟ้าไทย ผงปรุงรสเจ เห็ดหอม 850 ก.เหลือง (1*6)\",ลังX6,90126025\n0127029,\"สิงห์โตม้า เครื่องเทศ ซอง 5 บ. (1*40*25)\",ลูกx1000,90127029\n0127030,\"สิงห์โตม้า ผงกะหรี่ ซอง 8 บ. (1*40*25)\",ลูกx1000,90127030\n0127050,\"โป๊ยกั๊ก เครื่องตุ๋นเนื้อ แผง (1*10)\",แผงx10,90127050\n0127051,\"โป๊ยกั๊ก เครื่องตุ๋นหมู แผง (1*10)\",แผงx10,90127051\n0201011,\"จัสมิน ข้าวหอมมะลิ 100% 5 กก. ถุงแดง-ดำ\",ลูกx6,9120006\n0201015,\"จัสมิน ข้าวหอมกรุ่น 5 กก. (1*6)\",ลูกx6,90201015\n0201020,\"จัสมิน ข้าวหอมไทย น้ำเงิน 5 กก.(1*6)\",ลูกx6,90201020\n0202003,\"จัสมิน ข้าวเหนียวเขี้ยวงู 5 กก. (1*6)\",ลูกx6,90202003\n0203017,\"ไร่ทิพย์ แมงลัก 500 ก. (1*20)\",มัดX20,90203017\n0204050,\"วิมาน วุ้นเส้น 25 ก. (1*300)\",มัดx300,90204050\n0204051,\"วิมาน วุ้นเส้น 80 ก. (1*100)\",มัดx100,90204051\n0204052,\"วิมาน วุ้นเส้น 200 ก. (1*50)\",มัดx50,90204052\n0204053,\"วิมาน วุ้นเส้น 500 ก. (1*20)\",มัดX20,90204053\n0204100,\"มังกร เส้นหมี่อบแห้ง 380 ก. หมี่หมอนเบา(1*5)\",มัดx5,90204100\n0204260,\"ลาฟอนเต้ มักกะโรนี ข้องอใหญ่ (#11) 500 กรัม (1*10)\",ลังX10,90204260\n0205004,\"คนอร์ โจ๊กกึ่งสำเร็จรูป ซอง 35 ก. รสปลา (1*24*4)\",ลังX96,90205004\n0205024,\"คนอร์คัพโจ๊ก ถ้วย 35 ก. รสปลา (1*6*6)\",ลังX6,90205024\n0205355,\"ซือดะ ซอง 55 ก. คละรส (1*6*30)\",ลังX180,90205355\n0206030,\"ไทยเอดี ปลาเกล็ดขาวทอดกรอบ 25 ก. (1*48)\",ลังX48,90206030\n0210001,\"วรรณา หมูหยอง 500 ก. (1*50)\",ลังX50,90210001\n0210021,\"ร่ำรวย หมูหยอง 1 กก. (1*5*5)\",ลังX25,90210021\n0301003,\"พรภัณฑ์ น้ำนมแมว ขวด 22 cc (1*33*12)\",ลังx33,90301003\n0301111,\"วินเนอร์ สีน้ำม่วง 28 มล. 1 ออนซ์ (1*12)\",โหลx12,90301111\n0301114,\"วินเนอร์ สีน้ำฟ้า 28 มล. 1 ออนซ์ (1*12)\",โหลx12,90301114\n0302001,\"นางเงือก ผงวุ้น ซอง 25 ก. สีน้ำเงิน (1*300)\",ถังx300,90302001\n0302002,\"นางเงือก ผงวุ้น ซอง 50 ก. สีน้ำเงิน (1*150)\",ถังx150,90302002\n0302003,\"นางเงือก ผงวุ้น ซอง 50 ก. สีเขียว (1*150)\",ถังx150,90302003\n0407006,\"เป๊ปซี่ น้ำอัดลม ขวด 430 มล. 15 บ. (1*24)\",แพ็คx24,90407006\n0408001,\"บวร น้ำดื่ม 350 มล. (1*12)\",แพ็คX12,90408001\n0408002,\"บวร น้ำดื่ม 600 มล. (1*12)\",แพ็คX12,90408002\n0408004,\"บวร น้ำดื่ม 1500 มล. (1*6)\",แพ็คx6,90408004\n0507281,\"เถ้าแก่น้อย สาหร่าย 3.2 ก. รสเผ็ด 5บ.(1*10*12)\",ลังX10,90507281\n2002024,\"[SP]โพรเทคส์ สบู่ก้อน 60 ก. ลาเวนเดอร์ไอซ์ 4+1 (1*18*5)\",ลังx90,92002024\n2002070,\"เบนเนท สบู่ก้อน 130 ก. ส้ม (1*6*12)\",ลังX72,92002070\n2106022,\"วิกซอล น้ำยาล้างห้องน้ำ 900 มล. ทอง (1*12)\",ลังX12,92106022\n3001030,\"ตราม้าบิน ตะปูสังกะสี (1*50)\",ลังX50,93001030\n4001004,\"มงกุฎ ถุงร้อน PP 2.5*5 (1*6*5)\",มัดx30,94001004\n4001005,\"มงกุฎ ถุงร้อน PP 3*5 (1*6*5)\",มัดx30,94001005\n4001006,\"มงกุฎ ถุงร้อน PP 3.5*6 (1*6*5)\",มัดx30,94001006\n5001047,\"ซิลเวอร์ อาหารแมว ฟิต&เฟิร์ม 400 ก. ชมพู (1*25)\",กระสอบx25,95001047\n5001048,\"ซิลเวอร์ อาหารแมว เทสตี้ 400 ก. แดง (1*25)\",กระสอบx25,95001048\n6001001,\"ถุงเท้าข้อสั้น คละสี** 20บ.** (1*12)\",แพ็คX12,96001001\n";
+  var TEMPLATE_CSV = "รหัสสินค้า,ชื่อสินค้า,หน่วยนับ,บาร์โค้ด\n0105070,\"ฟาร์มเฮาท์ เกล็ดขนมปัง 200 ก. (1*12)\",ลังX12,90105070\n0110015,\"ธงแดงคู่จี้แซ ซีอิ๊วดำหวาน 300 มล. เล็ก (1*12)\",ลังX12,90110015\n0204050,\"วิมาน วุ้นเส้น 25 ก. (1*300)\",มัดx300,90204050\n0408002,\"บวร น้ำดื่ม 600 มล. (1*12)\",แพ็คX12,90408002\n5001047,\"ซิลเวอร์ อาหารแมว ฟิต&เฟิร์ม 400 ก. ชมพู (1*25)\",กระสอบx25,95001047\n";
+  var CODE128_PATTERNS = ["11011001100","11001101100","11001100110","10010011000","10010001100","10001001100",
+  "10011001000","10011000100","10001100100","11001001000","11001000100","11000100100",
+  "10110011100","10011011100","10011001110","10111001100","10011101100","10011100110",
+  "11001110010","11001011100","11001001110","11011100100","11001110100","11101101110",
+  "11101001100","11100101100","11100100110","11101100100","11100110100","11100110010",
+  "11011011000","11011000110","11000110110","10100011000","10001011000","10001000110",
+  "10110001000","10001101000","10001100010","11010001000","11000101000","11000100010",
+  "10110111000","10110001110","10001101110","10111011000","10111000110","10001110110",
+  "11101110110","11010001110","11000101110","11011101000","11011100010","11011101110",
+  "11101011000","11101000110","11100010110","11101101000","11101100010","11100011010",
+  "11101111010","11001000010","11110001010","10100110000","10100001100","10010110000",
+  "10010000110","10000101100","10000100110","10110010000","10110000100","10011010000",
+  "10011000010","10000110100","10000110010","11000010010","11001010000","11110111010",
+  "11000010100","10001111010","10100111100","10010111100","10010011110","10111100100",
+  "10011110100","10011110010","11110100100","11110010100","11110010010","11011011110",
+  "11011110110","11110110110","10101111000","10100011110","10001011110","10111101000",
+  "10111100010","11110101000","11110100010","10111011110","10111101110","11101011110",
+  "11110101110","11010000100","11010010000","11010011100","11000111010","11"];
+  var EAN_L = ["0001101","0011001","0010011","0111101","0100011","0110001","0101111","0111011","0110111","0001011"];
+  var EAN_G = ["0100111","0110011","0011011","0100001","0011101","0111001","0000101","0010001","0001001","0010111"];
+  var EAN_R = [];
+  var EAN13_FAMILIES = ["000000","001011","001101","001110","010011","011001","011100","010101","010110","011010"];
+  var i;
+  for (i = 0; i < EAN_G.length; i++) {
+    EAN_R.push(EAN_G[i].split('').reverse().join(''));
+  }
 
   var state = {
     products: [],
-    filtered: [],
-    selectedIndex: -1
+    selectedId: '',
+    sourceLabel: 'ข้อมูลตัวอย่างในระบบ',
+    updatedAt: '',
+    render: null
   };
 
-  var E = {
-    appStatus: document.getElementById('appStatus'),
-    csvFile: document.getElementById('csvFile'),
-    loadFileBtn: document.getElementById('loadFileBtn'),
-    loadSampleBtn: document.getElementById('loadSampleBtn'),
-    clearDataBtn: document.getElementById('clearDataBtn'),
-    rawText: document.getElementById('rawText'),
-    loadTextBtn: document.getElementById('loadTextBtn'),
-    pasteSampleBtn: document.getElementById('pasteSampleBtn'),
-    searchInput: document.getElementById('searchInput'),
-    sortMode: document.getElementById('sortMode'),
-    countInfo: document.getElementById('countInfo'),
-    productList: document.getElementById('productList'),
-    productCode: document.getElementById('productCode'),
-    productUnit: document.getElementById('productUnit'),
-    productName: document.getElementById('productName'),
-    barcodeValue: document.getElementById('barcodeValue'),
-    barcodeType: document.getElementById('barcodeType'),
-    useBarcodeBtn: document.getElementById('useBarcodeBtn'),
-    useCodeBtn: document.getElementById('useCodeBtn'),
-    generateBtn: document.getElementById('generateBtn'),
-    renderNote: document.getElementById('renderNote'),
-    barcodeSvg: document.getElementById('barcodeSvg'),
-    humanText: document.getElementById('humanText'),
-    selectedMeta: document.getElementById('selectedMeta'),
-    downloadPngBtn: document.getElementById('downloadPngBtn'),
-    printBtn: document.getElementById('printBtn')
-  };
+  var els = {};
 
-  function setStatus(kind, text) {
-    E.appStatus.className = 'pill status ' + kind;
-    E.appStatus.textContent = text;
+  function $(id) {
+    return document.getElementById(id);
   }
 
-  function escapeHtml(s) {
-    return String(s || '').replace(/[&<>"']/g, function (m) {
-      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
-    });
+  function setStatus(text, kind) {
+    var el = els.appStatus;
+    el.className = 'status-chip' + (kind ? ' ' + kind : '');
+    el.innerHTML = escapeHtml(text);
   }
 
-  function saveProducts() {
-    try {
-      localStorage.setItem('barcodeProducts', JSON.stringify(state.products));
-    } catch (err) {}
-  }
-
-  function loadProducts() {
-    try {
-      var raw = localStorage.getItem('barcodeProducts');
-      if (!raw) return false;
-      var arr = JSON.parse(raw);
-      if (!arr || !arr.length) return false;
-      state.products = arr;
-      filterAndRender();
-      setStatus('ok', 'พร้อมใช้งาน');
-      return true;
-    } catch (err) {
-      return false;
-    }
-  }
-
-  function normalizeKey(s) {
-    return String(s || '').replace(/\s+/g, '').trim().toLowerCase();
-  }
-
-  function detectDelimiter(text) {
-    var sample = (text || '').split(/\r?\n/).slice(0, 5).join('\n');
-    if (sample.indexOf('\t') >= 0) return '\t';
-    var commaCount = (sample.match(/,/g) || []).length;
-    var semiCount = (sample.match(/;/g) || []).length;
-    if (semiCount > commaCount) return ';';
-    if (commaCount > 0) return ',';
-    return 'spaces';
-  }
-
-  function splitRow(row, delimiter) {
-    if (delimiter === 'spaces') {
-      return row.trim().split(/\s{2,}/);
-    }
-    var out = [];
-    var cur = '';
-    var q = false;
-    var i;
-    for (i = 0; i < row.length; i++) {
-      var ch = row.charAt(i);
-      if (ch === '"') {
-        if (q && row.charAt(i + 1) === '"') {
-          cur += '"';
-          i++;
-        } else {
-          q = !q;
-        }
-      } else if (ch === delimiter && !q) {
-        out.push(cur);
-        cur = '';
-      } else {
-        cur += ch;
-      }
-    }
-    out.push(cur);
-    return out;
-  }
-
-  function parseText(text) {
-    var clean = String(text || '').replace(/^\uFEFF/, '').trim();
-    if (!clean) throw new Error('ไม่พบข้อความสำหรับนำเข้า');
-    var lines = clean.split(/\r?\n/).filter(function (x) { return x.trim(); });
-    if (!lines.length) throw new Error('ไม่พบบรรทัดข้อมูล');
-    var delimiter = detectDelimiter(clean);
-    var headers = splitRow(lines[0], delimiter).map(function (x) { return x.trim(); });
-    var keyMap = {};
-    headers.forEach(function (h, i) { keyMap[normalizeKey(h)] = i; });
-
-    function pickIndex(options, fallback) {
-      var i;
-      for (i = 0; i < options.length; i++) {
-        if (typeof keyMap[normalizeKey(options[i])] !== 'undefined') return keyMap[normalizeKey(options[i])];
-      }
-      return fallback;
-    }
-
-    var idxCode = pickIndex(['รหัสสินค้า', 'รหัส', 'productcode', 'sku', 'code'], 0);
-    var idxName = pickIndex(['ชื่อสินค้า', 'ชื่อ', 'productname', 'name'], 1);
-    var idxUnit = pickIndex(['หน่วยนับ', 'หน่วย', 'unit'], 2);
-    var idxBarcode = pickIndex(['บาร์โค้ด', 'barcode', 'ean', 'ean8', 'ean13'], 3);
-
-    var rows = [];
-    var startAt = 1;
-    if (headers.length < 2 || (normalizeKey(headers[0]) && !isNaN(Number(headers[0])))) {
-      startAt = 0;
-    }
-
-    var i;
-    for (i = startAt; i < lines.length; i++) {
-      var cols = splitRow(lines[i], delimiter).map(function (x) { return x.trim(); });
-      if (cols.length === 1 && delimiter !== 'spaces') {
-        cols = lines[i].trim().split(/\s{2,}/);
-      }
-      if (!cols.length) continue;
-      var row = {
-        code: cols[idxCode] || '',
-        name: cols[idxName] || '',
-        unit: cols[idxUnit] || '',
-        barcode: cols[idxBarcode] || ''
-      };
-      if (row.code || row.name || row.barcode) rows.push(row);
-    }
-    if (!rows.length) throw new Error('อ่านข้อมูลได้ แต่ไม่พบรายการสินค้า');
-    return rows;
-  }
-
-  function importProducts(text) {
-    var rows = parseText(text);
-    state.products = rows;
-    state.selectedIndex = -1;
-    saveProducts();
-    filterAndRender();
-    setStatus('ok', 'พร้อมใช้งาน');
-    alert('นำเข้ารายการสินค้าแล้ว ' + rows.length + ' รายการ');
-  }
-
-  function sortRows(rows) {
-    var mode = E.sortMode.value;
-    rows.sort(function (a, b) {
-      var av = String(a[mode === 'name' ? 'name' : mode === 'barcode' ? 'barcode' : 'code'] || '');
-      var bv = String(b[mode === 'name' ? 'name' : mode === 'barcode' ? 'barcode' : 'code'] || '');
-      return av.localeCompare(bv, 'th');
-    });
-  }
-
-  function filterAndRender() {
-    var q = E.searchInput.value.trim().toLowerCase();
-    var rows = state.products.slice();
-    if (q) {
-      rows = rows.filter(function (p) {
-        return [p.code, p.name, p.unit, p.barcode].join(' ').toLowerCase().indexOf(q) >= 0;
-      });
-    }
-    sortRows(rows);
-    state.filtered = rows;
-    E.countInfo.textContent = rows.length ? ('พบ ' + rows.length + ' รายการ') : 'ยังไม่มีข้อมูลสินค้า';
-    renderProductList();
-  }
-
-  function renderProductList() {
-    if (!state.filtered.length) {
-      E.productList.innerHTML = '<div class="item"><div class="meta">ยังไม่มีรายการสินค้า ลองโหลดข้อมูลตัวอย่างหรืออัปโหลด CSV</div></div>';
-      return;
-    }
-    var html = state.filtered.map(function (p, i) {
-      return '<div class="item' + (i === state.selectedIndex ? ' active' : '') + '" data-index="' + i + '">' +
-        '<div class="item-title">' + escapeHtml(p.name || '-') + '</div>' +
-        '<div class="meta">รหัส: ' + escapeHtml(p.code || '-') + ' | หน่วย: ' + escapeHtml(p.unit || '-') + ' | บาร์โค้ด: ' + escapeHtml(p.barcode || '-') + '</div>' +
-        '</div>';
-    }).join('');
-    E.productList.innerHTML = html;
-  }
-
-  function chooseProduct(index) {
-    var p = state.filtered[index];
-    if (!p) return;
-    state.selectedIndex = index;
-    E.productCode.value = p.code || '';
-    E.productName.value = p.name || '';
-    E.productUnit.value = p.unit || '';
-    E.barcodeValue.value = p.barcode || p.code || '';
-    E.selectedMeta.textContent = [p.code || '-', p.name || '-', p.unit || '-', 'BC: ' + (p.barcode || '-')].join(' | ');
-    renderProductList();
-  }
-
-  function calcEANCheckDigit(digits) {
-    var sum = 0;
-    var i;
-    for (i = 0; i < digits.length; i++) {
-      var n = Number(digits.charAt(i));
-      sum += n * ((digits.length - i) % 2 === 0 ? 3 : 1);
-    }
-    return (10 - (sum % 10)) % 10;
-  }
-
-  var L = ['0001101','0011001','0010011','0111101','0100011','0110001','0101111','0111011','0110111','0001011'];
-  var G = ['0100111','0110011','0011011','0100001','0011101','0111001','0000101','0010001','0001001','0010111'];
-  var R = ['1110010','1100110','1101100','1000010','1011100','1001110','1010000','1000100','1001000','1110100'];
-  var PARITY13 = ['LLLLLL','LLGLGG','LLGGLG','LLGGGL','LGLLGG','LGGLLG','LGGGLL','LGLGLG','LGLGGL','LGGLGL'];
-
-  function buildEAN8(value) {
-    var digits = String(value).replace(/\D/g, '');
-    if (digits.length === 7) digits += String(calcEANCheckDigit(digits));
-    if (digits.length !== 8) throw new Error('EAN-8 ต้องมี 7 หรือ 8 หลัก');
-    var left = digits.slice(0, 4).split('').map(function (d) { return L[Number(d)]; }).join('');
-    var right = digits.slice(4).split('').map(function (d) { return R[Number(d)]; }).join('');
-    return { bits: '101' + left + '01010' + right + '101', text: digits, type: 'EAN-8' };
-  }
-
-  function buildEAN13(value) {
-    var digits = String(value).replace(/\D/g, '');
-    if (digits.length === 12) digits += String(calcEANCheckDigit(digits));
-    if (digits.length !== 13) throw new Error('EAN-13 ต้องมี 12 หรือ 13 หลัก');
-    var first = Number(digits.charAt(0));
-    var parity = PARITY13[first];
-    var leftBits = '';
-    var i;
-    for (i = 1; i <= 6; i++) {
-      var dig = Number(digits.charAt(i));
-      leftBits += parity.charAt(i - 1) === 'L' ? L[dig] : G[dig];
-    }
-    var rightBits = '';
-    for (i = 7; i < 13; i++) rightBits += R[Number(digits.charAt(i))];
-    return { bits: '101' + leftBits + '01010' + rightBits + '101', text: digits, type: 'EAN-13' };
-  }
-
-  var CODE128 = [
-    '11011001100','11001101100','11001100110','10010011000','10010001100','10001001100','10011001000','10011000100','10001100100','11001001000',
-    '11001000100','11000100100','10110011100','10011011100','10011001110','10111001100','10011101100','10011100110','11001110010','11001011100',
-    '11001001110','11011100100','11001110100','11101101110','11101001100','11100101100','11100100110','11101100100','11100110100','11100110010',
-    '11011011000','11011000110','11000110110','10100011000','10001011000','10001000110','10110001000','10001101000','10001100010','11010001000',
-    '11000101000','11000100010','10110111000','10110001110','10001101110','10111011000','10111000110','10001110110','11101110110','11010001110',
-    '11000101110','11011101000','11011100010','11011101110','11101011000','11101000110','11100010110','11101101000','11101100010','11100011010',
-    '11101111010','11001000010','11110001010','10100110000','10100001100','10010110000','10010000110','10000101100','10000100110','10110010000',
-    '10110000100','10011010000','10011000010','10000110100','10000110010','11000010010','11001010000','11110111010','11000010100','10001111010',
-    '10100111100','10010111100','10010011110','10111100100','10011110100','10011110010','11110100100','11110010100','11110010010','11011011110',
-    '11011110110','11110110110','10101111000','10100011110','10001011110','10111101000','10111100010','11110101000','11110100010','10111011110',
-    '10111101110','11101011110','11110101110','11010000100','11010010000','11010011100','1100011101011'
-  ];
-
-  function buildCode128(value) {
-    var s = String(value);
-    var codes = [];
-    var checksum;
-    var i;
-    if (/^\d+$/.test(s) && s.length >= 2 && s.length % 2 === 0) {
-      codes.push(105);
-      for (i = 0; i < s.length; i += 2) codes.push(Number(s.substr(i, 2)));
-    } else {
-      codes.push(104);
-      for (i = 0; i < s.length; i++) {
-        var code = s.charCodeAt(i) - 32;
-        if (code < 0 || code > 95) throw new Error('CODE128 รองรับอักขระพื้นฐาน ASCII');
-        codes.push(code);
-      }
-    }
-    checksum = codes[0];
-    for (i = 1; i < codes.length; i++) checksum += codes[i] * i;
-    checksum = checksum % 103;
-    codes.push(checksum);
-    codes.push(106);
-    return {
-      bits: codes.map(function (c) { return CODE128[c]; }).join(''),
-      text: s,
-      type: 'CODE128'
-    };
-  }
-
-  function autoType(value) {
-    var digits = String(value).replace(/\D/g, '');
-    if (/^\d{7,8}$/.test(digits)) return 'EAN8';
-    if (/^\d{12,13}$/.test(digits)) return 'EAN13';
-    return 'CODE128';
-  }
-
-  function buildBarcode(value, forcedType) {
-    var type = forcedType === 'auto' ? autoType(value) : forcedType;
-    if (type === 'EAN8') return buildEAN8(value);
-    if (type === 'EAN13') return buildEAN13(value);
-    return buildCode128(value);
-  }
-
-  function renderSvg(data) {
-    var bits = data.bits;
-    var quiet = 10;
-    var barW = Math.max(1, Math.floor(280 / bits.length));
-    var width = bits.length * barW + quiet * 2;
-    var height = 110;
-    var x = quiet;
-    var parts = ['<rect width="100%" height="100%" fill="#fff"/>'];
-    var i;
-    for (i = 0; i < bits.length; i++) {
-      if (bits.charAt(i) === '1') {
-        parts.push('<rect x="' + x + '" y="8" width="' + barW + '" height="88" fill="#000"/>');
-      }
-      x += barW;
-    }
-    parts.push('<text x="50%" y="128" text-anchor="middle" font-size="15" font-family="Arial, sans-serif">' + escapeHtml(data.text) + '</text>');
-    E.barcodeSvg.setAttribute('viewBox', '0 0 ' + width + ' 140');
-    E.barcodeSvg.innerHTML = parts.join('');
-    E.humanText.textContent = data.text;
-    E.renderNote.textContent = 'ชนิดที่ใช้: ' + data.type;
-  }
-
-  function generate() {
-    try {
-      var value = E.barcodeValue.value.trim();
-      if (!value) throw new Error('กรุณากรอกเลขสำหรับสร้างบาร์โค้ด');
-      var data = buildBarcode(value, E.barcodeType.value);
-      renderSvg(data);
-    } catch (err) {
-      alert(err.message || String(err));
-    }
-  }
-
-  function svgToPngDownload() {
-    var svg = E.barcodeSvg;
-    if (!svg.innerHTML) return alert('กรุณาสร้างบาร์โค้ดก่อน');
-    var xml = new XMLSerializer().serializeToString(svg);
-    var img = new Image();
-    var blob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
-    var url = URL.createObjectURL(blob);
-    img.onload = function () {
-      var canvas = document.createElement('canvas');
-      canvas.width = svg.viewBox.baseVal.width || 640;
-      canvas.height = svg.viewBox.baseVal.height || 280;
-      var ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0);
-      URL.revokeObjectURL(url);
-      var a = document.createElement('a');
-      a.href = canvas.toDataURL('image/png');
-      a.download = 'barcode.png';
-      a.click();
-    };
-    img.src = url;
-  }
-
-  function printBarcode() {
-    window.print();
-  }
-
-  function bindEvents() {
-    E.loadFileBtn.onclick = function () {
-      var file = E.csvFile.files && E.csvFile.files[0];
-      if (!file) return alert('กรุณาเลือกไฟล์ก่อน');
-      if (/\.xlsx$/i.test(file.name)) return alert('ไฟล์ .xlsx ใช้ไม่ได้โดยตรง กรุณา Save As เป็น CSV UTF-8 ก่อน');
-      var reader = new FileReader();
-      reader.onload = function (e) {
-        try { importProducts(e.target.result || ''); }
-        catch (err) { alert(err.message || String(err)); }
-      };
-      reader.onerror = function () { alert('อ่านไฟล์ไม่สำเร็จ'); };
-      reader.readAsText(file, 'utf-8');
-    };
-
-    E.loadSampleBtn.onclick = function () { importProducts(SAMPLE_TEXT); };
-    E.clearDataBtn.onclick = function () {
-      state.products = [];
-      state.filtered = [];
-      state.selectedIndex = -1;
-      localStorage.removeItem('barcodeProducts');
-      filterAndRender();
-      E.selectedMeta.textContent = 'ยังไม่ได้เลือกสินค้า';
-      alert('ล้างข้อมูลสินค้าแล้ว');
-    };
-    E.loadTextBtn.onclick = function () {
-      try { importProducts(E.rawText.value); }
-      catch (err) { alert(err.message || String(err)); }
-    };
-    E.pasteSampleBtn.onclick = function () { E.rawText.value = SAMPLE_TEXT; };
-    E.searchInput.oninput = filterAndRender;
-    E.sortMode.onchange = filterAndRender;
-    E.productList.onclick = function (evt) {
-      var el = evt.target;
-      while (el && !el.getAttribute('data-index')) el = el.parentNode;
-      if (!el) return;
-      chooseProduct(Number(el.getAttribute('data-index')));
-    };
-    E.useBarcodeBtn.onclick = function () {
-      E.barcodeValue.value = E.barcodeValue.value || E.productCode.value;
-      if (!E.barcodeValue.value && state.selectedIndex >= 0) {
-        var p = state.filtered[state.selectedIndex];
-        E.barcodeValue.value = p.barcode || p.code || '';
-      }
-      generate();
-    };
-    E.useCodeBtn.onclick = function () {
-      E.barcodeValue.value = E.productCode.value.trim();
-      generate();
-    };
-    E.generateBtn.onclick = generate;
-    E.downloadPngBtn.onclick = svgToPngDownload;
-    E.printBtn.onclick = printBarcode;
+  function setRuntimeMessage(text, isError) {
+    els.runtimeMessage.className = isError ? 'notice error' : 'notice';
+    els.runtimeMessage.innerHTML = escapeHtml(text);
   }
 
   function init() {
-    bindEvents();
-    setStatus('ok', 'พร้อมใช้งาน');
-    if (!loadProducts()) {
-      E.rawText.value = SAMPLE_TEXT;
-      filterAndRender();
+    cache();
+    setStatus('พร้อมใช้งาน', 'ok');
+    setRuntimeMessage('แอพพร้อมใช้งานแล้ว', false);
+    bind();
+    restoreSaved();
+    if (!state.products.length) {
+      state.products = parseProductsFromText(DEMO_CSV);
+      state.sourceLabel = 'ข้อมูลตัวอย่างในระบบ';
+      state.updatedAt = nowIso();
+      saveState('โหลดข้อมูลตัวอย่างอัตโนมัติ');
     }
-    try {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(function () {});
-      }
-    } catch (err) {}
+    renderAll();
+    if (state.products.length) {
+      selectProduct(state.products[0].id);
+      fillFromSelected('barcode');
+    }
+    drawEmpty();
   }
 
-  init();
+  function cache() {
+    var ids = ['appStatus','runtimeMessage','csvFile','loadDemoBtn','downloadTemplateBtn','exportBtn','clearSavedBtn','sourceText','countText','importNotice','pasteBox','importTextBtn','fillExampleBtn','clearTextBtn','searchBox','resultCount','clearSearchBtn','productList','selectedBox','barcodeValue','formatSelect','useBarcodeBtn','useCodeBtn','generateBtn','downloadPngBtn','copyBtn','printBtn','barcodeNotice','previewTitle','previewLines','barcodeCanvas','caption'];
+    for (var j = 0; j < ids.length; j++) {
+      els[ids[j]] = $(ids[j]);
+    }
+  }
+
+  function bind() {
+    els.csvFile.addEventListener('change', onFileChange, false);
+    els.importTextBtn.addEventListener('click', function() {
+      importFromText(els.pasteBox.value, 'นำเข้าจากข้อความที่วาง');
+    }, false);
+    els.fillExampleBtn.addEventListener('click', function() {
+      els.pasteBox.value = TEMPLATE_CSV;
+      showImportNotice('ใส่ตัวอย่างลงช่องข้อความแล้ว กด “นำเข้าจากข้อความ” ได้เลย', false);
+    }, false);
+    els.clearTextBtn.addEventListener('click', function() {
+      els.pasteBox.value = '';
+      showImportNotice('ล้างข้อความแล้ว', false);
+    }, false);
+    els.loadDemoBtn.addEventListener('click', function() {
+      state.products = parseProductsFromText(DEMO_CSV);
+      state.sourceLabel = 'ข้อมูลตัวอย่างในระบบ';
+      state.updatedAt = nowIso();
+      saveState('โหลดข้อมูลตัวอย่าง');
+      renderAll();
+      if (state.products.length) {
+        selectProduct(state.products[0].id);
+        fillFromSelected('barcode');
+        generate();
+      }
+      showImportNotice('โหลดข้อมูลตัวอย่างสำเร็จ ' + state.products.length + ' รายการ', false);
+    }, false);
+    els.downloadTemplateBtn.addEventListener('click', function() {
+      downloadText('products_template.csv', TEMPLATE_CSV);
+    }, false);
+    els.exportBtn.addEventListener('click', function() {
+      downloadText('products_export.csv', exportCsv(state.products));
+    }, false);
+    els.clearSavedBtn.addEventListener('click', function() {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(STORAGE_META_KEY);
+      } catch (e) {}
+      showImportNotice('ล้างข้อมูลที่บันทึกไว้แล้ว', false);
+    }, false);
+    els.searchBox.addEventListener('input', renderList, false);
+    els.clearSearchBtn.addEventListener('click', function() {
+      els.searchBox.value = '';
+      renderList();
+    }, false);
+    els.productList.addEventListener('click', function(ev) {
+      var target = ev.target;
+      while (target && target !== els.productList && !target.getAttribute('data-id')) {
+        target = target.parentNode;
+      }
+      if (target && target.getAttribute) {
+        var id = target.getAttribute('data-id');
+        if (id) {
+          selectProduct(id);
+          fillFromSelected('barcode');
+          generate();
+          scrollToBarcode();
+        }
+      }
+    }, false);
+    els.useBarcodeBtn.addEventListener('click', function() {
+      fillFromSelected('barcode');
+      generate();
+    }, false);
+    els.useCodeBtn.addEventListener('click', function() {
+      fillFromSelected('productCode');
+      generate();
+    }, false);
+    els.generateBtn.addEventListener('click', generate, false);
+    els.formatSelect.addEventListener('change', generate, false);
+    els.barcodeValue.addEventListener('input', function() {
+      window.clearTimeout(state._typingTimer);
+      state._typingTimer = window.setTimeout(generate, 180);
+    }, false);
+    els.downloadPngBtn.addEventListener('click', downloadPng, false);
+    els.copyBtn.addEventListener('click', copyValue, false);
+    els.printBtn.addEventListener('click', function() {
+      window.print();
+    }, false);
+  }
+
+  function onFileChange(ev) {
+    var file = ev.target && ev.target.files ? ev.target.files[0] : null;
+    if (!file) return;
+    var lower = (file.name || '').toLowerCase();
+    if (lower.indexOf('.xlsx') > -1) {
+      showImportNotice('ไฟล์ .xlsx ใช้ไม่ได้โดยตรง กรุณา Save As เป็น CSV UTF-8 ก่อน', true);
+      ev.target.value = '';
+      return;
+    }
+    readFileText(file, function(err, text) {
+      if (err) {
+        showImportNotice(err.message || 'อ่านไฟล์ไม่สำเร็จ', true);
+      } else {
+        importFromText(text, 'อัปโหลดจากไฟล์: ' + (file.name || 'ไม่มีชื่อไฟล์'));
+      }
+      ev.target.value = '';
+    });
+  }
+
+  function readFileText(file, done) {
+    tryReadFile(file, 'utf-8', function(err, text) {
+      if (!err && looksReadable(text)) {
+        done(null, text);
+        return;
+      }
+      tryReadFile(file, 'windows-874', function(err2, text2) {
+        if (!err2 && looksReadable(text2)) {
+          done(null, text2);
+          return;
+        }
+        tryReadFile(file, 'tis-620', function(err3, text3) {
+          if (!err3 && looksReadable(text3)) {
+            done(null, text3);
+            return;
+          }
+          done(new Error('อ่านไฟล์ไม่ได้ หรือไฟล์ว่าง'));
+        });
+      });
+    });
+  }
+
+  function tryReadFile(file, encoding, done) {
+    try {
+      var reader = new FileReader();
+      reader.onerror = function() {
+        done(new Error('เบราว์เซอร์อ่านไฟล์ไม่สำเร็จ'));
+      };
+      reader.onload = function() {
+        done(null, reader.result || '');
+      };
+      try {
+        reader.readAsText(file, encoding);
+      } catch (e) {
+        reader.readAsText(file);
+      }
+    } catch (e2) {
+      done(new Error('อุปกรณ์นี้ไม่รองรับการอ่านไฟล์จากหน้า HTML'));
+    }
+  }
+
+  function looksReadable(text) {
+    text = normalizeImportedText(text);
+    if (!text) return false;
+    var bad = (text.match(/�/g) || []).length;
+    var good = (text.match(/[ก-๙A-Za-z0-9]/g) || []).length;
+    return good > 0 && bad < good;
+  }
+
+  function importFromText(text, source) {
+    text = normalizeImportedText(text);
+    if (!text) {
+      showImportNotice('กรุณาเลือกไฟล์ หรือวางข้อความก่อนนำเข้า', true);
+      return;
+    }
+    var products = parseProductsFromText(text);
+    if (!products.length) {
+      showImportNotice('ไม่พบรายการสินค้า ตรวจดูว่ามี 4 คอลัมน์: รหัสสินค้า / ชื่อสินค้า / หน่วยนับ / บาร์โค้ด', true);
+      return;
+    }
+    state.products = products;
+    state.sourceLabel = source;
+    state.updatedAt = nowIso();
+    saveState('นำเข้าสำเร็จ ' + products.length + ' รายการ');
+    renderAll();
+    selectProduct(products[0].id);
+    fillFromSelected('barcode');
+    generate();
+    showImportNotice('นำเข้าสำเร็จ ' + products.length + ' รายการ', false);
+  }
+
+  function normalizeImportedText(raw) {
+    return String(raw == null ? '' : raw)
+      .replace(/^\uFEFF/, '')
+      .replace(/\u0000/g, '')
+      .replace(/\u00A0/g, ' ')
+      .replace(/\r\n/g, '\n')
+      .replace(/\r/g, '\n')
+      .replace(/[\u200B-\u200D\uFEFF]/g, '')
+      .replace(/^\s+|\s+$/g, '');
+  }
+
+  function parseProductsFromText(text) {
+    var rows = parseDelimitedText(text);
+    if (!rows.length) return [];
+    var headers = [];
+    var useHeader = false;
+    var j;
+    for (j = 0; j < rows[0].length; j++) {
+      headers.push(canonicalHeader(rows[0][j]));
+    }
+    var recognized = 0;
+    for (j = 0; j < headers.length; j++) {
+      if (headers[j]) recognized++;
+    }
+    if (recognized >= 2) useHeader = true;
+    if (!useHeader) {
+      headers = ['productCode','productName','unit','barcode'];
+    }
+    var start = useHeader ? 1 : 0;
+    var out = [];
+    var seen = {};
+    for (var i = start; i < rows.length; i++) {
+      var row = rows[i];
+      var rec = {};
+      for (j = 0; j < headers.length; j++) {
+        if (headers[j]) {
+          rec[headers[j]] = cleanText(row[j]);
+        }
+      }
+      var p = normalizeProduct(rec, out.length);
+      if (!p) continue;
+      var key = p.productCode + '|' + p.productName + '|' + p.barcode;
+      if (seen[key]) continue;
+      seen[key] = true;
+      out.push(p);
+    }
+    return out;
+  }
+
+  function parseDelimitedText(text) {
+    text = normalizeImportedText(text);
+    if (!text) return [];
+    var first = '';
+    var lines = text.split('\n');
+    for (var i = 0; i < lines.length; i++) {
+      if (cleanText(lines[i])) {
+        first = lines[i];
+        break;
+      }
+    }
+    var delimiter = detectDelimiter(first);
+    var rows = [];
+    if (delimiter) {
+      rows = parseWithDelimiter(text, delimiter);
+    }
+    if (!rows.length || allRowsSingleColumn(rows)) {
+      rows = parseLooseColumns(text);
+    }
+    var cleaned = [];
+    for (i = 0; i < rows.length; i++) {
+      var hasValue = false;
+      for (var j = 0; j < rows[i].length; j++) {
+        if (cleanText(rows[i][j])) {
+          hasValue = true;
+          break;
+        }
+      }
+      if (hasValue) cleaned.push(rows[i]);
+    }
+    return cleaned;
+  }
+
+  function allRowsSingleColumn(rows) {
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i].length > 1) return false;
+    }
+    return true;
+  }
+
+  function parseWithDelimiter(text, delimiter) {
+    var rows = [];
+    var row = [];
+    var field = '';
+    var inQuotes = false;
+    for (var i = 0; i < text.length; i++) {
+      var ch = text.charAt(i);
+      var next = text.charAt(i + 1);
+      if (ch === '"') {
+        if (inQuotes && next === '"') {
+          field += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+        continue;
+      }
+      if (!inQuotes && ch === delimiter) {
+        row.push(field);
+        field = '';
+        continue;
+      }
+      if (!inQuotes && ch === '\n') {
+        row.push(field);
+        rows.push(row);
+        row = [];
+        field = '';
+        continue;
+      }
+      field += ch;
+    }
+    row.push(field);
+    rows.push(row);
+    return rows;
+  }
+
+  function parseLooseColumns(text) {
+    var lines = text.split('\n');
+    var out = [];
+    for (var i = 0; i < lines.length; i++) {
+      var cols = splitLooseLine(lines[i]);
+      if (cols.length) out.push(cols);
+    }
+    return out;
+  }
+
+  function splitLooseLine(line) {
+    var text = cleanText(line);
+    if (!text) return [];
+    var parts;
+    if (/\t/.test(text)) {
+      parts = text.split(/\t+/);
+      return filterNonEmpty(parts);
+    }
+    parts = text.split(/\s{2,}/);
+    parts = filterNonEmpty(parts);
+    if (parts.length >= 4) {
+      return [parts[0], parts.slice(1, parts.length - 2).join(' '), parts[parts.length - 2], parts[parts.length - 1]];
+    }
+    var simple = filterNonEmpty(text.split(/\s+/));
+    if (simple.length === 4 &&
+        canonicalHeader(simple[0]) &&
+        canonicalHeader(simple[1]) &&
+        canonicalHeader(simple[2]) &&
+        canonicalHeader(simple[3])) {
+      return simple;
+    }
+    var m = text.match(/^(\S+)\s+(.+?)\s+(\S+)\s+(\S+)$/);
+    if (m) {
+      return [m[1], m[2], m[3], m[4]];
+    }
+    return [text];
+  }
+
+  function filterNonEmpty(arr) {
+    var out = [];
+    for (var i = 0; i < arr.length; i++) {
+      var t = cleanText(arr[i]);
+      if (t) out.push(t);
+    }
+    return out;
+  }
+
+  function detectDelimiter(line) {
+    var cands = [',','\t',';','|'];
+    var best = '';
+    var bestCount = 0;
+    for (var i = 0; i < cands.length; i++) {
+      var ch = cands[i];
+      var count = 0;
+      for (var j = 0; j < line.length; j++) {
+        if (line.charAt(j) === ch) count++;
+      }
+      if (count > bestCount) {
+        best = ch;
+        bestCount = count;
+      }
+    }
+    return best;
+  }
+
+  function canonicalHeader(v) {
+    var key = cleanText(v).toLowerCase().replace(/[\s_\-:()]/g, '');
+    var map = {
+      'รหัสสินค้า':'productCode',
+      'รหัส':'productCode',
+      'รหัสsku':'productCode',
+      'code':'productCode',
+      'productcode':'productCode',
+      'sku':'productCode',
+      'ชื่อสินค้า':'productName',
+      'ชื่อ':'productName',
+      'สินค้า':'productName',
+      'รายละเอียดสินค้า':'productName',
+      'productname':'productName',
+      'name':'productName',
+      'หน่วยนับ':'unit',
+      'หน่วย':'unit',
+      'หน่วยขาย':'unit',
+      'unit':'unit',
+      'uom':'unit',
+      'บาร์โค้ด':'barcode',
+      'บาร์โค๊ด':'barcode',
+      'เลขบาร์โค้ด':'barcode',
+      'barcode':'barcode',
+      'ean':'barcode',
+      'ean8':'barcode',
+      'ean13':'barcode'
+    };
+    return map[key] || '';
+  }
+
+  function normalizeProduct(record, index) {
+    var productCode = cleanText(record.productCode || record.code || record.sku);
+    var productName = cleanText(record.productName || record.name || record.product);
+    var unit = cleanText(record.unit || record.uom || record.quantityUnit);
+    var barcode = cleanText(record.barcode || record.ean || record.barCode);
+    if (!productCode && !productName && !unit && !barcode) return null;
+    return {
+      id: (productCode || 'item') + '-' + (barcode || 'barcode') + '-' + index + '-' + Math.abs(hashCode(productName || productCode || barcode)),
+      productCode: productCode,
+      productName: productName,
+      unit: unit,
+      barcode: barcode,
+      searchText: (productCode + ' ' + productName + ' ' + unit + ' ' + barcode).toLowerCase()
+    };
+  }
+
+  function restoreSaved() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      var metaRaw = localStorage.getItem(STORAGE_META_KEY);
+      if (raw) {
+        var arr = JSON.parse(raw);
+        if (arr && arr.length) {
+          var normalized = [];
+          for (var i = 0; i < arr.length; i++) {
+            var p = normalizeProduct(arr[i], i);
+            if (p) normalized.push(p);
+          }
+          state.products = normalized;
+        }
+      }
+      if (metaRaw) {
+        var meta = JSON.parse(metaRaw);
+        if (meta) {
+          state.sourceLabel = meta.sourceLabel || state.sourceLabel;
+          state.updatedAt = meta.updatedAt || state.updatedAt;
+        }
+      }
+    } catch (e) {}
+  }
+
+  function saveState(note) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.products));
+      localStorage.setItem(STORAGE_META_KEY, JSON.stringify({
+        sourceLabel: state.sourceLabel,
+        updatedAt: state.updatedAt,
+        note: note || ''
+      }));
+    } catch (e) {}
+  }
+
+  function renderAll() {
+    renderSummary();
+    renderList();
+    renderSelected();
+  }
+
+  function renderSummary() {
+    els.sourceText.innerHTML = escapeHtml(state.sourceLabel + (state.updatedAt ? ' • ' + formatDateTime(state.updatedAt) : ''));
+    els.countText.innerHTML = numberWithCommas(state.products.length);
+  }
+
+  function renderList() {
+    var q = cleanText(els.searchBox.value).toLowerCase();
+    var tokens = q ? q.split(/\s+/) : [];
+    var matched = [];
+    for (var i = 0; i < state.products.length; i++) {
+      var p = state.products[i];
+      var ok = true;
+      for (var j = 0; j < tokens.length; j++) {
+        if (p.searchText.indexOf(tokens[j]) === -1) {
+          ok = false;
+          break;
+        }
+      }
+      if (ok) matched.push(p);
+    }
+    els.resultCount.innerHTML = 'พบ ' + numberWithCommas(matched.length) + ' รายการ';
+    if (!matched.length) {
+      els.productList.innerHTML = '<div class="empty">ไม่พบสินค้าที่ตรงกับคำค้น</div>';
+      return;
+    }
+    var limit = matched.length > 40 ? 40 : matched.length;
+    var html = '';
+    for (i = 0; i < limit; i++) {
+      p = matched[i];
+      var cls = 'product-btn' + (p.id === state.selectedId ? ' active' : '');
+      html += '<button type="button" class="' + cls + '" data-id="' + escapeAttr(p.id) + '">';
+      html += '<div class="pname">' + escapeHtml(p.productName || '(ไม่มีชื่อสินค้า)') + '</div>';
+      html += '<div class="pmeta">รหัส: ' + escapeHtml(p.productCode || '-') + '<br>หน่วย: ' + escapeHtml(p.unit || '-') + '<br>บาร์โค้ด: ' + escapeHtml(p.barcode || '-') + '</div>';
+      html += '</button>';
+    }
+    if (matched.length > limit) {
+      html += '<div class="empty">แสดง 40 รายการแรก กรุณาพิมพ์ค้นหาเพิ่มเพื่อเจาะจงสินค้า</div>';
+    }
+    els.productList.innerHTML = html;
+  }
+
+  function selectProduct(id) {
+    state.selectedId = id;
+    renderList();
+    renderSelected();
+    fillFromSelected('barcode');
+    generate();
+  }
+
+  function getSelected() {
+    for (var i = 0; i < state.products.length; i++) {
+      if (state.products[i].id === state.selectedId) return state.products[i];
+    }
+    return null;
+  }
+
+  function renderSelected() {
+    var p = getSelected();
+    if (!p) {
+      els.selectedBox.className = 'empty';
+      els.selectedBox.innerHTML = 'ยังไม่ได้เลือกสินค้า';
+      return;
+    }
+    els.selectedBox.className = '';
+    els.selectedBox.innerHTML = '<div class="preview-title">' + escapeHtml(p.productName || '(ไม่มีชื่อสินค้า)') + '</div>' +
+      '<div class="preview-lines">' +
+      '<div>รหัสสินค้า: ' + escapeHtml(p.productCode || '-') + '</div>' +
+      '<div>หน่วยนับ: ' + escapeHtml(p.unit || '-') + '</div>' +
+      '<div>เลขบาร์โค้ด: ' + escapeHtml(p.barcode || '-') + '</div>' +
+      '</div>';
+  }
+
+  function fillFromSelected(sourceField) {
+    var p = getSelected();
+    if (!p) {
+      showBarcodeNotice('กรุณาเลือกสินค้าก่อน', true);
+      return;
+    }
+    if (sourceField === 'productCode') {
+      els.barcodeValue.value = p.productCode || p.barcode || '';
+      els.formatSelect.value = 'CODE128';
+    } else {
+      els.barcodeValue.value = p.barcode || p.productCode || '';
+    }
+    showBarcodeNotice('ใส่เลขจากสินค้าแล้ว', false);
+  }
+
+  function generate() {
+    var raw = cleanText(els.barcodeValue.value);
+    var fmt = els.formatSelect.value;
+    if (!raw) {
+      state.render = null;
+      drawEmpty();
+      showBarcodeNotice('เลือกสินค้าแล้วกด “ใช้เลขจากคอลัมน์บาร์โค้ด” หรือกรอกเลขเอง', false);
+      return;
+    }
+    try {
+      var info;
+      if (fmt === 'EAN8') {
+        info = buildEan8(raw);
+      } else if (fmt === 'EAN13') {
+        info = buildEan13(raw);
+      } else {
+        info = buildCode128(raw);
+      }
+      var p = getSelected();
+      state.render = {
+        pattern: info.pattern,
+        text: info.text,
+        format: fmt,
+        title: p ? p.productName || 'สินค้า' : 'โหมดกำหนดเอง',
+        lines: p ? [
+          'รหัสสินค้า: ' + (p.productCode || '-'),
+          'หน่วยนับ: ' + (p.unit || '-'),
+          'เลขสำหรับสร้างบาร์โค้ด: ' + info.text
+        ] : [
+          'เลขสำหรับสร้างบาร์โค้ด: ' + info.text
+        ]
+      };
+      drawBarcode();
+      showBarcodeNotice(info.note || 'สร้างบาร์โค้ดสำเร็จ', false);
+    } catch (e) {
+      state.render = null;
+      drawEmpty();
+      showBarcodeNotice(e.message || 'สร้างบาร์โค้ดไม่สำเร็จ', true);
+    }
+  }
+
+  function drawEmpty() {
+    var canvas = els.barcodeCanvas;
+    var ctx = canvas.getContext('2d');
+    setupCanvas(320, 180);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, 320, 180);
+    ctx.fillStyle = '#6b7280';
+    ctx.textAlign = 'center';
+    ctx.font = '600 16px sans-serif';
+    ctx.fillText('ยังไม่มีบาร์โค้ดสำหรับแสดงผล', 160, 86);
+    ctx.font = '400 13px sans-serif';
+    ctx.fillText('เลือกสินค้า หรือกรอกเลขด้านบน', 160, 112);
+    els.previewTitle.innerHTML = 'ตัวอย่างบาร์โค้ด';
+    els.previewLines.innerHTML = 'ยังไม่มีข้อมูล';
+    els.caption.innerHTML = '—';
+  }
+
+  function setupCanvas(w, h) {
+    var canvas = els.barcodeCanvas;
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    var ctx = canvas.getContext('2d');
+    if (ctx.setTransform) {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    } else {
+      ctx.scale(dpr, dpr);
+    }
+    ctx.imageSmoothingEnabled = false;
+  }
+
+  function drawBarcode() {
+    if (!state.render) {
+      drawEmpty();
+      return;
+    }
+    var quiet = state.render.format === 'CODE128' ? 10 : 7;
+    var pattern = state.render.pattern;
+    var maxWidth = Math.min((window.innerWidth || 390) - 60, 440);
+    var moduleWidth = Math.max(1.3, Math.min(3.0, maxWidth / (pattern.length + quiet * 2)));
+    var barHeight = state.render.format === 'CODE128' ? 108 : 102;
+    var width = Math.max(360, Math.ceil((pattern.length + quiet * 2) * moduleWidth));
+    var textY = barHeight + 20;
+    var detailStartY = textY + 28;
+    var detailLines = [];
+    detailLines = detailLines.concat(wrapCanvasText(state.render.title || '', width - 28, '600 14px sans-serif'));
+    for (var di = 0; di < state.render.lines.length; di++) {
+      var wrapped = wrapCanvasText(state.render.lines[di], width - 28, '400 12px sans-serif');
+      for (var dj = 0; dj < wrapped.length; dj++) detailLines.push(wrapped[dj]);
+    }
+    var height = detailStartY + (detailLines.length * 18) + 12;
+    setupCanvas(width, height);
+    var canvas = els.barcodeCanvas;
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+    var x = (width - (pattern.length * moduleWidth)) / 2;
+    ctx.fillStyle = '#111827';
+    for (var i = 0; i < pattern.length; i++) {
+      if (pattern.charAt(i) === '1') {
+        ctx.fillRect(x, 8, moduleWidth, barHeight - 12);
+      }
+      x += moduleWidth;
+    }
+    ctx.fillStyle = '#111827';
+    ctx.textAlign = 'center';
+    ctx.font = '600 18px sans-serif';
+    ctx.fillText(state.render.text, width / 2, textY);
+
+    var lineY = detailStartY;
+    for (i = 0; i < detailLines.length; i++) {
+      ctx.font = i < wrapCanvasText(state.render.title || '', width - 28, '600 14px sans-serif').length ? '600 14px sans-serif' : '400 12px sans-serif';
+      ctx.fillText(detailLines[i], width / 2, lineY);
+      lineY += 18;
+    }
+
+    els.previewTitle.innerHTML = escapeHtml(state.render.title);
+    var linesHtml = '';
+    for (i = 0; i < state.render.lines.length; i++) {
+      linesHtml += '<div>' + escapeHtml(state.render.lines[i]) + '</div>';
+    }
+    els.previewLines.innerHTML = linesHtml;
+    els.caption.innerHTML = escapeHtml(state.render.text + ' • ' + state.render.format);
+  }
+
+  function wrapCanvasText(text, maxWidth, font) {
+    var value = cleanText(text || '');
+    if (!value) return [];
+    var canvas = els.barcodeCanvas;
+    var ctx = canvas.getContext('2d');
+    ctx.font = font || '400 12px sans-serif';
+    var words = value.split(/\s+/);
+    var lines = [];
+    var line = '';
+    for (var i = 0; i < words.length; i++) {
+      var test = line ? (line + ' ' + words[i]) : words[i];
+      if (ctx.measureText(test).width <= maxWidth) {
+        line = test;
+      } else {
+        if (line) lines.push(line);
+        if (ctx.measureText(words[i]).width <= maxWidth) {
+          line = words[i];
+        } else {
+          var chars = '';
+          for (var j = 0; j < words[i].length; j++) {
+            var ctest = chars + words[i].charAt(j);
+            if (ctx.measureText(ctest).width > maxWidth && chars) {
+              lines.push(chars);
+              chars = words[i].charAt(j);
+            } else {
+              chars = ctest;
+            }
+          }
+          line = chars;
+        }
+      }
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  function buildCode128(value) {
+    var input = cleanText(value);
+    if (!input) throw new Error('กรุณากรอกเลขหรือข้อความก่อนสร้างบาร์โค้ด');
+    var isEvenNumeric = /^\d+$/.test(input) && input.length % 2 === 0;
+    var codes = [];
+    var checksumBase = 0;
+    var i, ch;
+    if (isEvenNumeric) {
+      codes = [105];
+      checksumBase = 105;
+      for (i = 0; i < input.length; i += 2) {
+        codes.push(parseInt(input.substr(i, 2), 10));
+      }
+    } else {
+      for (i = 0; i < input.length; i++) {
+        ch = input.charCodeAt(i);
+        if (ch < 32 || ch > 126) {
+          throw new Error('CODE128 ในแอพนี้รองรับอักขระ ASCII พื้นฐาน 32-126 เท่านั้น');
+        }
+      }
+      codes = [104];
+      checksumBase = 104;
+      for (i = 0; i < input.length; i++) {
+        codes.push(input.charCodeAt(i) - 32);
+      }
+    }
+    var checksum = checksumBase;
+    for (i = 1; i < codes.length; i++) {
+      checksum += codes[i] * i;
+    }
+    checksum = checksum % 103;
+    var finalCodes = codes.slice(0);
+    finalCodes.push(checksum);
+    finalCodes.push(106);
+    finalCodes.push(107);
+    var pattern = '';
+    for (i = 0; i < finalCodes.length; i++) {
+      pattern += CODE128_PATTERNS[finalCodes[i]];
+    }
+    return {
+      pattern: pattern,
+      text: input,
+      note: isEvenNumeric ? 'ระบบใช้ CODE128 ชุด C อัตโนมัติสำหรับเลขคู่ทั้งหมด' : 'ระบบใช้ CODE128 ชุด B'
+    };
+  }
+
+  function buildEan8(value) {
+    var digits = cleanText(value);
+    if (!/^\d{7,8}$/.test(digits)) throw new Error('EAN-8 ต้องเป็นตัวเลข 7 หรือ 8 หลัก');
+    var normalized = digits.length === 7 ? digits + computeEanCheckDigit(digits) : digits;
+    if (computeEanCheckDigit(normalized.substring(0, normalized.length - 1)) !== normalized.charAt(normalized.length - 1)) {
+      throw new Error('EAN-8 checksum ไม่ถูกต้อง');
+    }
+    var pattern = '101';
+    var i;
+    for (i = 0; i < 4; i++) pattern += EAN_L[parseInt(normalized.charAt(i), 10)];
+    pattern += '01010';
+    for (i = 4; i < normalized.length; i++) pattern += EAN_R[parseInt(normalized.charAt(i), 10)];
+    pattern += '101';
+    return {
+      pattern: pattern,
+      text: normalized,
+      note: digits.length === 7 ? 'เติม checksum ให้อัตโนมัติเป็น ' + normalized : ''
+    };
+  }
+
+  function buildEan13(value) {
+    var digits = cleanText(value);
+    if (!/^\d{12,13}$/.test(digits)) throw new Error('EAN-13 ต้องเป็นตัวเลข 12 หรือ 13 หลัก');
+    var normalized = digits.length === 12 ? digits + computeEanCheckDigit(digits) : digits;
+    if (computeEanCheckDigit(normalized.substring(0, normalized.length - 1)) !== normalized.charAt(normalized.length - 1)) {
+      throw new Error('EAN-13 checksum ไม่ถูกต้อง');
+    }
+    var family = EAN13_FAMILIES[parseInt(normalized.charAt(0), 10)];
+    var pattern = '101';
+    var i, digit, table;
+    for (i = 1; i <= 6; i++) {
+      digit = parseInt(normalized.charAt(i), 10);
+      table = family.charAt(i - 1) === '0' ? EAN_L : EAN_G;
+      pattern += table[digit];
+    }
+    pattern += '01010';
+    for (i = 7; i < normalized.length; i++) {
+      pattern += EAN_R[parseInt(normalized.charAt(i), 10)];
+    }
+    pattern += '101';
+    return {
+      pattern: pattern,
+      text: normalized,
+      note: digits.length === 12 ? 'เติม checksum ให้อัตโนมัติเป็น ' + normalized : ''
+    };
+  }
+
+  function computeEanCheckDigit(body) {
+    var total = 0;
+    var pos = 0;
+    for (var i = body.length - 1; i >= 0; i--) {
+      var digit = parseInt(body.charAt(i), 10);
+      total += digit * (pos % 2 === 0 ? 3 : 1);
+      pos++;
+    }
+    return String((10 - (total % 10)) % 10);
+  }
+
+  function downloadPng() {
+    if (!state.render) {
+      showBarcodeNotice('ยังไม่มีบาร์โค้ดสำหรับดาวน์โหลด', true);
+      return;
+    }
+    try {
+      var link = document.createElement('a');
+      link.href = els.barcodeCanvas.toDataURL('image/png');
+      link.download = getBaseName() + '.png';
+      link.click();
+    } catch (e) {
+      showBarcodeNotice('ดาวน์โหลดรูปไม่สำเร็จ ลองกดค้างที่ภาพหรือพิมพ์เป็น PDF แทน', true);
+    }
+  }
+
+  function copyValue() {
+    var value = state.render ? state.render.text : cleanText(els.barcodeValue.value);
+    if (!value) {
+      showBarcodeNotice('ยังไม่มีเลขให้คัดลอก', true);
+      return;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(value).then(function() {
+        showBarcodeNotice('คัดลอกเลขแล้ว: ' + value, false);
+      }, function() {
+        fallbackCopy(value);
+      });
+    } else {
+      fallbackCopy(value);
+    }
+  }
+
+  function fallbackCopy(value) {
+    try {
+      els.barcodeValue.focus();
+      els.barcodeValue.select();
+      document.execCommand('copy');
+      showBarcodeNotice('คัดลอกเลขแล้ว: ' + value, false);
+    } catch (e) {
+      showBarcodeNotice('คัดลอกอัตโนมัติไม่สำเร็จ กรุณาคัดลอกด้วยตนเอง', true);
+    }
+  }
+
+  function getBaseName() {
+    var p = getSelected();
+    var base = p ? (p.productCode || '') : '';
+    if (!base) base = state.render ? state.render.text : 'barcode';
+    base = String(base).replace(/[^0-9A-Za-z_-]+/g, '_').replace(/^_+|_+$/g, '');
+    return base || 'barcode';
+  }
+
+  function exportCsv(products) {
+    var rows = [['รหัสสินค้า','ชื่อสินค้า','หน่วยนับ','บาร์โค้ด']];
+    for (var i = 0; i < products.length; i++) {
+      rows.push([products[i].productCode || '', products[i].productName || '', products[i].unit || '', products[i].barcode || '']);
+    }
+    var out = [];
+    for (i = 0; i < rows.length; i++) {
+      var row = [];
+      for (var j = 0; j < rows[i].length; j++) {
+        row.push(escapeCsv(rows[i][j]));
+      }
+      out.push(row.join(','));
+    }
+    return out.join('\n');
+  }
+
+  function escapeCsv(value) {
+    var text = String(value == null ? '' : value);
+    if (/[",\n]/.test(text)) {
+      return '"' + text.replace(/"/g, '""') + '"';
+    }
+    return text;
+  }
+
+  function downloadText(filename, content) {
+    var blob = new Blob(['\uFEFF' + content], { type: 'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    window.setTimeout(function() {
+      URL.revokeObjectURL(url);
+    }, 1200);
+  }
+
+  function showImportNotice(text, isError) {
+    els.importNotice.className = isError ? 'notice error' : 'notice';
+    els.importNotice.innerHTML = escapeHtml(text);
+    setRuntimeMessage(text, isError);
+  }
+
+  function showBarcodeNotice(text, isError) {
+    els.barcodeNotice.className = isError ? 'notice error' : 'notice';
+    els.barcodeNotice.innerHTML = escapeHtml(text);
+  }
+
+  function scrollToBarcode() {
+    var box = els.barcodeValue;
+    if (box && box.scrollIntoView) {
+      box.scrollIntoView({ behavior:'smooth', block:'center' });
+    }
+  }
+
+  function nowIso() {
+    return new Date().toISOString();
+  }
+
+  function formatDateTime(value) {
+    try {
+      return new Date(value).toLocaleString('th-TH');
+    } catch (e) {
+      return value;
+    }
+  }
+
+  function numberWithCommas(value) {
+    try {
+      return Number(value).toLocaleString('th-TH');
+    } catch (e) {
+      return String(value);
+    }
+  }
+
+  function cleanText(v) {
+    return String(v == null ? '' : v).replace(/^\uFEFF/, '').replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/^\s+|\s+$/g, '');
+  }
+
+  function escapeHtml(v) {
+    return String(v == null ? '' : v)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function escapeAttr(v) {
+    return escapeHtml(v);
+  }
+
+  function hashCode(value) {
+    var hash = 0, i, chr;
+    value = String(value || '');
+    for (i = 0; i < value.length; i++) {
+      chr = value.charCodeAt(i);
+      hash = ((hash << 5) - hash) + chr;
+      hash |= 0;
+    }
+    return hash;
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, false);
+  } else {
+    init();
+  }
 })();
 </script>
 </body>
