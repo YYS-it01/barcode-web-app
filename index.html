@@ -132,10 +132,10 @@ noscript .fallback, .js-only-hidden { display:none; }
 <main class="wrap">
   <section class="hero">
     <h1>แอพบาร์โค้ดสินค้า</h1>
-    <p>เลือกสินค้าได้จากรายการ, แตะสินค้าแล้วสร้างบาร์โค้ดแบบ Code-128 ทันที, นำเข้าข้อมูลจากไฟล์ CSV/TXT หรือวางข้อความ 4 คอลัมน์ได้</p>
+    <p>เลือกสินค้าได้จากรายการ, แตะสินค้าแล้วสร้างบาร์โค้ดแบบ Code-128 ทันที และดึงข้อมูลสินค้าจาก Google Sheets อัตโนมัติเมื่อเปิดแอพ</p>
     <div class="badges">
       <span>เหมาะกับมือถือ</span>
-      <span>รองรับ CSV / TSV / TXT</span>
+      <span>ดึงข้อมูลจาก Google Sheets อัตโนมัติ</span>
       <span>ใช้แบบออฟไลน์ได้</span>
       <span>ดาวน์โหลด PNG ได้</span>
     </div>
@@ -151,16 +151,13 @@ noscript .fallback, .js-only-hidden { display:none; }
   </section>
 
   <section class="card" id="importCard">
-    <h2>1) นำเข้ารายการสินค้า</h2>
-    <label for="csvFile">เลือกไฟล์ CSV / TXT / TSV</label>
-    <input id="csvFile" type="file" accept=".csv,.txt,.tsv,text/csv,text/plain,text/tab-separated-values,application/csv,application/vnd.ms-excel">
-    <div class="small" style="margin-top:8px;">ไฟล์ Excel .xlsx ใช้ไม่ได้โดยตรง ต้อง Save As เป็น CSV UTF-8 ก่อน</div>
+    <h2>1) โหลดรายการสินค้าอัตโนมัติ</h2>
+    <div class="small">แอพจะดึงข้อมูลจาก Google Sheets อัตโนมัติทันทีตอนเปิดหน้า และสามารถกดโหลดใหม่ได้ทุกเมื่อ</div>
 
     <div class="toolbar" style="margin-top:10px;">
-      <button type="button" class="soft" id="loadDemoBtn">โหลดข้อมูลตัวอย่าง</button>
-      <button type="button" id="downloadTemplateBtn">ดาวน์โหลดเทมเพลต CSV</button>
+      <button type="button" class="primary" id="reloadSheetBtn">โหลดข้อมูลจาก Google Sheets ใหม่</button>
       <button type="button" id="exportBtn">ส่งออกข้อมูลปัจจุบัน</button>
-      <button type="button" class="danger" id="clearSavedBtn">ล้างข้อมูลที่บันทึกไว้</button>
+      <button type="button" class="danger" id="clearSavedBtn">ล้างข้อมูลที่แคชไว้</button>
     </div>
 
     <div class="stats">
@@ -168,18 +165,11 @@ noscript .fallback, .js-only-hidden { display:none; }
       <div class="stat"><span class="k">จำนวนสินค้า</span><strong id="countText">0</strong></div>
     </div>
 
-    <div id="importNotice" class="notice">รองรับหัวคอลัมน์: รหัสสินค้า, ชื่อสินค้า, หน่วยนับ, บาร์โค้ด</div>
+    <div id="importNotice" class="notice">ระบบจะอ่านข้อมูลผ่าน Google Apps Script ที่เชื่อมกับชีต Products อัตโนมัติ</div>
 
-    <div style="margin-top:12px;">
-      <label for="pasteBox">หรือวางข้อความตรงนี้</label>
-      <textarea id="pasteBox" placeholder="ตัวอย่าง
-รหัสสินค้า	ชื่อสินค้า	หน่วยนับ	บาร์โค้ด
-0105070	ฟาร์มเฮาท์ เกล็ดขนมปัง 200 ก. (1*12)	ลังX12	90105070"></textarea>
-      <div class="toolbar" style="margin-top:8px;">
-        <button type="button" class="primary" id="importTextBtn">นำเข้าจากข้อความ</button>
-        <button type="button" id="fillExampleBtn">ใส่ตัวอย่างลงช่องข้อความ</button>
-        <button type="button" id="clearTextBtn">ล้างข้อความ</button>
-      </div>
+    <div class="help-box" style="margin-top:12px;">
+      <div><strong>ข้อกำหนดสำคัญ</strong></div>
+      <div class="small">ให้ Deploy Google Apps Script เป็น Web App แล้วนำ URL มาใส่ในไฟล์ HTML ตรงตัวแปร GOOGLE_APPS_SCRIPT_WEB_APP_URL เพื่อหลีกเลี่ยงปัญหา CORS</div>
     </div>
   </section>
 
@@ -194,7 +184,7 @@ noscript .fallback, .js-only-hidden { display:none; }
     <div id="selectedBox" class="empty" style="margin-top:12px;">ยังไม่ได้เลือกสินค้า</div>
   </section>
 
-  <section class="card">
+  <section class="card" id="barcodeSection">
     <h2>3) สร้างบาร์โค้ด</h2>
     <div class="grid2">
       <div>
@@ -235,8 +225,8 @@ noscript .fallback, .js-only-hidden { display:none; }
       <div><strong>วิธีส่งไฟล์ไปยังโทรศัพท์</strong></div>
       <div class="small">
         1) กดดาวน์โหลดไฟล์ HTML ลงเครื่องก่อน<br>
-        2) ย้ายไฟล์ไปที่แอป Files / ดาวน์โหลด / Google Drive / iCloud Drive<br>
-        3) เปิดไฟล์ด้วย <strong>Safari หรือ Chrome</strong> เท่านั้น ไม่ใช่หน้าพรีวิวในแชตหรือในแอปส่งไฟล์
+        2) เปิดไฟล์ด้วย <strong>Safari หรือ Chrome</strong> เท่านั้น ไม่ใช่หน้าพรีวิวในแชตหรือในแอปส่งไฟล์<br>
+        3) ต้องมีอินเทอร์เน็ตเพื่อให้แอพโหลดข้อมูลผ่าน Google Apps Script
       </div>
     </div>
     <div class="help-box" style="margin-top:10px;">
@@ -244,11 +234,10 @@ noscript .fallback, .js-only-hidden { display:none; }
       <div class="small">
         1) เปิดไฟล์ HTML นี้ใน Safari หรือ Chrome<br>
         2) ดูที่หัวข้อ “สถานะการทำงาน” ต้องขึ้นว่า <strong>พร้อมใช้งาน</strong><br>
-        3) ถ้ามีไฟล์สินค้า ให้กดเลือกไฟล์ CSV/TXT แล้วรอข้อความ “นำเข้าสำเร็จ”<br>
-        4) ถ้าไม่มีไฟล์ ให้กด “ใส่ตัวอย่างลงช่องข้อความ” หรือวางข้อมูล 4 คอลัมน์ แล้วกด “นำเข้าจากข้อความ”<br>
-        5) ค้นหาสินค้า แล้วกดรายการสินค้าที่ต้องการ<br>
-        6) แตะรายการสินค้า ระบบจะสร้างบาร์โค้ด Code-128 ให้ทันที<br>
-        7) ต้องการรูป ให้กด “ดาวน์โหลด PNG” หรือกด “พิมพ์ / บันทึก PDF”
+        3) รอให้ระบบโหลดข้อมูลจาก Google Apps Script อัตโนมัติจนขึ้นข้อความ “พร้อมใช้งาน”<br>
+        4) ค้นหาสินค้า แล้วกดรายการสินค้าที่ต้องการ<br>
+        5) แตะรายการสินค้า ระบบจะสร้างบาร์โค้ด Code-128 ให้ทันที<br>
+        6) ต้องการรูป ให้กด “ดาวน์โหลด PNG” หรือกด “พิมพ์ / บันทึก PDF”
       </div>
     </div>
     <div class="help-box" style="margin-top:10px;">
@@ -259,13 +248,17 @@ noscript .fallback, .js-only-hidden { display:none; }
     </div>
   </section>
 
-  <div class="footer" id="footer">เคล็ดลับ: ถ้าไฟล์มาจาก Excel ให้บันทึกเป็น CSV UTF-8 และตั้งคอลัมน์รหัส/บาร์โค้ดเป็นข้อความ เพื่อคงเลขศูนย์นำหน้าไว้</div>
+  <div class="footer" id="footer">เคล็ดลับ: Apps Script ควรอ่านชีตที่มีหัวคอลัมน์ รหัสสินค้า, ชื่อสินค้า, หน่วยนับ, บาร์โค้ด และควรตั้งคอลัมน์รหัส/บาร์โค้ดเป็นข้อความเพื่อคงเลขศูนย์นำหน้าไว้</div>
 </main>
 
 <script>
 (function() {
   var STORAGE_KEY = 'barcode_mobile_app_v3_products';
   var STORAGE_META_KEY = 'barcode_mobile_app_v3_meta';
+  var GOOGLE_CLIENT_EMAIL = 'google-sheets@xxxxxxx';
+  var GOOGLE_SHEETS_SPREADSHEET_ID = '1q2Nr6IVcyqh4UdIMW2pliP2eg1nj9uN-R9V0Ztxj_fU';
+  var GOOGLE_SHEET_CURRENT_PRICES = 'Products';
+  var GOOGLE_APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwGXbFVXEEI2oQR7FqtDRhlHoo2mPa3kVp2_B-UiiCAVbt7PtuQz9f836cJtHXfIzf4/exec';
   var DEMO_CSV = "รหัสสินค้า,ชื่อสินค้า,หน่วยนับ,บาร์โค้ด\n0105070,\"ฟาร์มเฮาท์ เกล็ดขนมปัง 200 ก. (1*12)\",ลังX12,90105070\n106031,\"ปลาแฟนซี แป้งข้าวเหนียวดำ 500 ก. (1*20)\",ลังX20,90106031\n0106035,\"ช้างเหยียบระฆัง แป้งข้าวจ้าว 400 ก. (1*20)\",มัดX20,90106035\n0106036,\"ช้างเหยียบระฆัง แป้งข้าวเหนียว 400 ก. (1*20)\",มัดX20,90106036\n0106037,\"ช้างเหยียบระฆัง แป้งข้าวจ้าว 900 ก. (1*10)\",มัดx10,90106037\n0106038,\"ช้างเหยียบระฆัง แป้งข้าวเหนียว 900 ก. (1*10)\",มัดx10,90106038\n0106041,\"ช้างชูระฆัง แป้งข้าวจ้าว 850 ก. (1*10)\",มัดx10,90106041\n0106042,\"ช้างชูระฆัง แป้งข้าวเหนียว 850 ก. (1*10)\",มัดx10,90106042\n0106058,\"ปลาไทย 5 ดาว แป้งมัน 30 กก.\",ลูกX30,90106058\n0106095,\"ยูยี แป้งกวนไส้ 450 ก (1*10*2)\",ลังX20,90106095\n0110015,\"ธงแดงคู่จี้แซ ซีอิ๊วดำหวาน 300 มล. เล็ก (1*12)\",ลังX12,90110015\n0110016,\"ธงแดงคู่จี้แซ ซีอิ๊วดำหวาน 630 มล. ใหญ่ (1*12)\",ลังX12,90110016\n0111005,\"ภูเขาทอง ซอสปรุงรสฝาเหลือง 110 มล. (1*12)\",ลังX12,90111005\n0111012,\"[SP]ฉลากทอง ซอสปรุงรสฉลากเขียว 700 มล. รุ่นแถมน้ำส้ม (1*12)\",ลังX12,90111012\n0113010,\"ธงแดงคู่จี้แซ เต้าเจี้ยว ขวดกลม 300 มล. (1*12)\",ลังX12,90113010\n0113011,\"ธงแดงคู่จี้แซ เต้าเจี้ยวพิเศษ ขวด (ปากน้ำโพ) 700 มล. (1*12)\",ลังX12,90113011\n0113020,\"ระฆัง เต้าหู้ยี้ กระปุกพลาสติก 2.7 กก (1*4)\",ลังX4,90113020\n0114004,\"ศุภวรรณ ซอสเย็นตาโฟ ขวด 750 ก. (1*6)\",แพ็คx6,90114004\n0116050,\"ศุภวรรณ น้ำจิ้มสุกี้ ขวด 750 ก. (1*6)\",แพ็คx6,90116050\n0126023,\"ฟ้าไทย ผงปรุงรสเจเห็ดหอม 165 ก.เหลือง (1*6*6)\",ลังX36,90126023\n0126025,\"ฟ้าไทย ผงปรุงรสเจ เห็ดหอม 850 ก.เหลือง (1*6)\",ลังX6,90126025\n0127029,\"สิงห์โตม้า เครื่องเทศ ซอง 5 บ. (1*40*25)\",ลูกx1000,90127029\n0127030,\"สิงห์โตม้า ผงกะหรี่ ซอง 8 บ. (1*40*25)\",ลูกx1000,90127030\n0127050,\"โป๊ยกั๊ก เครื่องตุ๋นเนื้อ แผง (1*10)\",แผงx10,90127050\n0127051,\"โป๊ยกั๊ก เครื่องตุ๋นหมู แผง (1*10)\",แผงx10,90127051\n0201011,\"จัสมิน ข้าวหอมมะลิ 100% 5 กก. ถุงแดง-ดำ\",ลูกx6,9120006\n0201015,\"จัสมิน ข้าวหอมกรุ่น 5 กก. (1*6)\",ลูกx6,90201015\n0201020,\"จัสมิน ข้าวหอมไทย น้ำเงิน 5 กก.(1*6)\",ลูกx6,90201020\n0202003,\"จัสมิน ข้าวเหนียวเขี้ยวงู 5 กก. (1*6)\",ลูกx6,90202003\n0203017,\"ไร่ทิพย์ แมงลัก 500 ก. (1*20)\",มัดX20,90203017\n0204050,\"วิมาน วุ้นเส้น 25 ก. (1*300)\",มัดx300,90204050\n0204051,\"วิมาน วุ้นเส้น 80 ก. (1*100)\",มัดx100,90204051\n0204052,\"วิมาน วุ้นเส้น 200 ก. (1*50)\",มัดx50,90204052\n0204053,\"วิมาน วุ้นเส้น 500 ก. (1*20)\",มัดX20,90204053\n0204100,\"มังกร เส้นหมี่อบแห้ง 380 ก. หมี่หมอนเบา(1*5)\",มัดx5,90204100\n0204260,\"ลาฟอนเต้ มักกะโรนี ข้องอใหญ่ (#11) 500 กรัม (1*10)\",ลังX10,90204260\n0205004,\"คนอร์ โจ๊กกึ่งสำเร็จรูป ซอง 35 ก. รสปลา (1*24*4)\",ลังX96,90205004\n0205024,\"คนอร์คัพโจ๊ก ถ้วย 35 ก. รสปลา (1*6*6)\",ลังX6,90205024\n0205355,\"ซือดะ ซอง 55 ก. คละรส (1*6*30)\",ลังX180,90205355\n0206030,\"ไทยเอดี ปลาเกล็ดขาวทอดกรอบ 25 ก. (1*48)\",ลังX48,90206030\n0210001,\"วรรณา หมูหยอง 500 ก. (1*50)\",ลังX50,90210001\n0210021,\"ร่ำรวย หมูหยอง 1 กก. (1*5*5)\",ลังX25,90210021\n0301003,\"พรภัณฑ์ น้ำนมแมว ขวด 22 cc (1*33*12)\",ลังx33,90301003\n0301111,\"วินเนอร์ สีน้ำม่วง 28 มล. 1 ออนซ์ (1*12)\",โหลx12,90301111\n0301114,\"วินเนอร์ สีน้ำฟ้า 28 มล. 1 ออนซ์ (1*12)\",โหลx12,90301114\n0302001,\"นางเงือก ผงวุ้น ซอง 25 ก. สีน้ำเงิน (1*300)\",ถังx300,90302001\n0302002,\"นางเงือก ผงวุ้น ซอง 50 ก. สีน้ำเงิน (1*150)\",ถังx150,90302002\n0302003,\"นางเงือก ผงวุ้น ซอง 50 ก. สีเขียว (1*150)\",ถังx150,90302003\n0407006,\"เป๊ปซี่ น้ำอัดลม ขวด 430 มล. 15 บ. (1*24)\",แพ็คx24,90407006\n0408001,\"บวร น้ำดื่ม 350 มล. (1*12)\",แพ็คX12,90408001\n0408002,\"บวร น้ำดื่ม 600 มล. (1*12)\",แพ็คX12,90408002\n0408004,\"บวร น้ำดื่ม 1500 มล. (1*6)\",แพ็คx6,90408004\n0507281,\"เถ้าแก่น้อย สาหร่าย 3.2 ก. รสเผ็ด 5บ.(1*10*12)\",ลังX10,90507281\n2002024,\"[SP]โพรเทคส์ สบู่ก้อน 60 ก. ลาเวนเดอร์ไอซ์ 4+1 (1*18*5)\",ลังx90,92002024\n2002070,\"เบนเนท สบู่ก้อน 130 ก. ส้ม (1*6*12)\",ลังX72,92002070\n2106022,\"วิกซอล น้ำยาล้างห้องน้ำ 900 มล. ทอง (1*12)\",ลังX12,92106022\n3001030,\"ตราม้าบิน ตะปูสังกะสี (1*50)\",ลังX50,93001030\n4001004,\"มงกุฎ ถุงร้อน PP 2.5*5 (1*6*5)\",มัดx30,94001004\n4001005,\"มงกุฎ ถุงร้อน PP 3*5 (1*6*5)\",มัดx30,94001005\n4001006,\"มงกุฎ ถุงร้อน PP 3.5*6 (1*6*5)\",มัดx30,94001006\n5001047,\"ซิลเวอร์ อาหารแมว ฟิต&เฟิร์ม 400 ก. ชมพู (1*25)\",กระสอบx25,95001047\n5001048,\"ซิลเวอร์ อาหารแมว เทสตี้ 400 ก. แดง (1*25)\",กระสอบx25,95001048\n6001001,\"ถุงเท้าข้อสั้น คละสี** 20บ.** (1*12)\",แพ็คX12,96001001\n";
   var TEMPLATE_CSV = "รหัสสินค้า,ชื่อสินค้า,หน่วยนับ,บาร์โค้ด\n0105070,\"ฟาร์มเฮาท์ เกล็ดขนมปัง 200 ก. (1*12)\",ลังX12,90105070\n0110015,\"ธงแดงคู่จี้แซ ซีอิ๊วดำหวาน 300 มล. เล็ก (1*12)\",ลังX12,90110015\n0204050,\"วิมาน วุ้นเส้น 25 ก. (1*300)\",มัดx300,90204050\n0408002,\"บวร น้ำดื่ม 600 มล. (1*12)\",แพ็คX12,90408002\n5001047,\"ซิลเวอร์ อาหารแมว ฟิต&เฟิร์ม 400 ก. ชมพู (1*25)\",กระสอบx25,95001047\n";
   var CODE128_PATTERNS = ["11011001100","11001101100","11001100110","10010011000","10010001100","10001001100",
@@ -322,59 +315,31 @@ noscript .fallback, .js-only-hidden { display:none; }
 
   function init() {
     cache();
-    setStatus('พร้อมใช้งาน', 'ok');
-    setRuntimeMessage('แอพพร้อมใช้งานแล้ว', false);
+    setStatus('กำลังโหลดข้อมูล...', '');
+    setRuntimeMessage('กำลังเตรียมแอพและเชื่อมต่อ Google Sheets...', false);
     bind();
     restoreSaved();
-    if (!state.products.length) {
-      state.products = parseProductsFromText(DEMO_CSV);
-      state.sourceLabel = 'ข้อมูลตัวอย่างในระบบ';
-      state.updatedAt = nowIso();
-      saveState('โหลดข้อมูลตัวอย่างอัตโนมัติ');
-    }
     renderAll();
     if (state.products.length) {
       selectProduct(state.products[0].id);
       fillFromSelected('barcode');
+      generate();
+    } else {
+      drawEmpty();
     }
-    drawEmpty();
+    loadFromGoogleSheet(true);
   }
 
   function cache() {
-    var ids = ['appStatus','runtimeMessage','csvFile','loadDemoBtn','downloadTemplateBtn','exportBtn','clearSavedBtn','sourceText','countText','importNotice','pasteBox','importTextBtn','fillExampleBtn','clearTextBtn','searchBox','resultCount','clearSearchBtn','productList','selectedBox','barcodeValue','useBarcodeBtn','useCodeBtn','generateBtn','downloadPngBtn','copyBtn','printBtn','barcodeNotice','previewTitle','previewLines','barcodeCanvas','caption'];
+    var ids = ['appStatus','runtimeMessage','reloadSheetBtn','exportBtn','clearSavedBtn','sourceText','countText','importNotice','searchBox','resultCount','clearSearchBtn','productList','selectedBox','barcodeValue','useBarcodeBtn','useCodeBtn','generateBtn','downloadPngBtn','copyBtn','printBtn','barcodeNotice','previewTitle','previewLines','barcodeCanvas','caption'];
     for (var j = 0; j < ids.length; j++) {
       els[ids[j]] = $(ids[j]);
     }
   }
 
   function bind() {
-    els.csvFile.addEventListener('change', onFileChange, false);
-    els.importTextBtn.addEventListener('click', function() {
-      importFromText(els.pasteBox.value, 'นำเข้าจากข้อความที่วาง');
-    }, false);
-    els.fillExampleBtn.addEventListener('click', function() {
-      els.pasteBox.value = TEMPLATE_CSV;
-      showImportNotice('ใส่ตัวอย่างลงช่องข้อความแล้ว กด “นำเข้าจากข้อความ” ได้เลย', false);
-    }, false);
-    els.clearTextBtn.addEventListener('click', function() {
-      els.pasteBox.value = '';
-      showImportNotice('ล้างข้อความแล้ว', false);
-    }, false);
-    els.loadDemoBtn.addEventListener('click', function() {
-      state.products = parseProductsFromText(DEMO_CSV);
-      state.sourceLabel = 'ข้อมูลตัวอย่างในระบบ';
-      state.updatedAt = nowIso();
-      saveState('โหลดข้อมูลตัวอย่าง');
-      renderAll();
-      if (state.products.length) {
-        selectProduct(state.products[0].id);
-        fillFromSelected('barcode');
-        generate();
-      }
-      showImportNotice('โหลดข้อมูลตัวอย่างสำเร็จ ' + state.products.length + ' รายการ', false);
-    }, false);
-    els.downloadTemplateBtn.addEventListener('click', function() {
-      downloadText('products_template.csv', TEMPLATE_CSV);
+    els.reloadSheetBtn.addEventListener('click', function() {
+      loadFromGoogleSheet(false);
     }, false);
     els.exportBtn.addEventListener('click', function() {
       downloadText('products_export.csv', exportCsv(state.products));
@@ -384,7 +349,13 @@ noscript .fallback, .js-only-hidden { display:none; }
         localStorage.removeItem(STORAGE_KEY);
         localStorage.removeItem(STORAGE_META_KEY);
       } catch (e) {}
-      showImportNotice('ล้างข้อมูลที่บันทึกไว้แล้ว', false);
+      state.products = [];
+      state.selectedId = '';
+      state.sourceLabel = 'ยังไม่ได้โหลดข้อมูล';
+      state.updatedAt = '';
+      renderAll();
+      drawEmpty();
+      showImportNotice('ล้างข้อมูลที่แคชไว้แล้ว', false);
     }, false);
     els.searchBox.addEventListener('input', renderList, false);
     els.clearSearchBtn.addEventListener('click', function() {
@@ -427,95 +398,107 @@ noscript .fallback, .js-only-hidden { display:none; }
     }, false);
   }
 
-  function onFileChange(ev) {
-    var file = ev.target && ev.target.files ? ev.target.files[0] : null;
-    if (!file) return;
-    var lower = (file.name || '').toLowerCase();
-    if (lower.indexOf('.xlsx') > -1) {
-      showImportNotice('ไฟล์ .xlsx ใช้ไม่ได้โดยตรง กรุณา Save As เป็น CSV UTF-8 ก่อน', true);
-      ev.target.value = '';
+  function loadFromGoogleSheet(isAutoLoad) {
+    setStatus('กำลังโหลดข้อมูล...', '');
+    setRuntimeMessage('กำลังดึงข้อมูลจาก Google Apps Script...', false);
+    showImportNotice('กำลังดึงข้อมูลจาก Google Apps Script...', false);
+
+    if (!GOOGLE_APPS_SCRIPT_WEB_APP_URL || GOOGLE_APPS_SCRIPT_WEB_APP_URL === 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE') {
+      handleSheetLoadError(new Error('ยังไม่ได้ใส่ URL ของ Google Apps Script Web App'), isAutoLoad);
       return;
     }
-    readFileText(file, function(err, text) {
-      if (err) {
-        showImportNotice(err.message || 'อ่านไฟล์ไม่สำเร็จ', true);
-      } else {
-        importFromText(text, 'อัปโหลดจากไฟล์: ' + (file.name || 'ไม่มีชื่อไฟล์'));
-      }
-      ev.target.value = '';
-    });
-  }
 
-  function readFileText(file, done) {
-    tryReadFile(file, 'utf-8', function(err, text) {
-      if (!err && looksReadable(text)) {
-        done(null, text);
-        return;
-      }
-      tryReadFile(file, 'windows-874', function(err2, text2) {
-        if (!err2 && looksReadable(text2)) {
-          done(null, text2);
-          return;
+    var url = GOOGLE_APPS_SCRIPT_WEB_APP_URL + (GOOGLE_APPS_SCRIPT_WEB_APP_URL.indexOf('?') === -1 ? '?' : '&') +
+      'spreadsheetId=' + encodeURIComponent(GOOGLE_SHEETS_SPREADSHEET_ID) +
+      '&sheet=' + encodeURIComponent(GOOGLE_SHEET_CURRENT_PRICES) +
+      '&t=' + Date.now();
+
+    fetch(url, { cache: 'no-store' })
+      .then(function(res) {
+        if (!res.ok) {
+          throw new Error('โหลดข้อมูลไม่สำเร็จ (HTTP ' + res.status + ')');
         }
-        tryReadFile(file, 'tis-620', function(err3, text3) {
-          if (!err3 && looksReadable(text3)) {
-            done(null, text3);
-            return;
-          }
-          done(new Error('อ่านไฟล์ไม่ได้ หรือไฟล์ว่าง'));
-        });
+        return res.json();
+      })
+      .then(function(payload) {
+        var products = extractProductsFromApiPayload(payload);
+        if (!products.length) {
+          throw new Error('ไม่พบรายการสินค้าในชีต ' + GOOGLE_SHEET_CURRENT_PRICES);
+        }
+        state.products = products;
+        state.sourceLabel = 'Google Apps Script: ' + GOOGLE_SHEET_CURRENT_PRICES;
+        state.updatedAt = nowIso();
+        saveState('โหลดจาก Google Apps Script');
+        renderAll();
+        selectProduct(products[0].id);
+        fillFromSelected('barcode');
+        generate();
+        setStatus('พร้อมใช้งาน', 'ok');
+        setRuntimeMessage('เชื่อมต่อ Google Apps Script สำเร็จ', false);
+        showImportNotice((isAutoLoad ? 'โหลดอัตโนมัติสำเร็จ ' : 'โหลดใหม่สำเร็จ ') + products.length + ' รายการ', false);
+      })
+      .catch(function(err) {
+        handleSheetLoadError(err, isAutoLoad);
       });
-    });
   }
 
-  function tryReadFile(file, encoding, done) {
-    try {
-      var reader = new FileReader();
-      reader.onerror = function() {
-        done(new Error('เบราว์เซอร์อ่านไฟล์ไม่สำเร็จ'));
-      };
-      reader.onload = function() {
-        done(null, reader.result || '');
-      };
-      try {
-        reader.readAsText(file, encoding);
-      } catch (e) {
-        reader.readAsText(file);
+  function handleSheetLoadError(err, isAutoLoad) {
+    if (!state.products.length) {
+      state.products = parseProductsFromText(DEMO_CSV);
+      state.sourceLabel = 'ข้อมูลตัวอย่างในระบบ (สำรอง)';
+      state.updatedAt = nowIso();
+      saveState('fallback demo data');
+      renderAll();
+      if (state.products.length) {
+        selectProduct(state.products[0].id);
+        fillFromSelected('barcode');
+        generate();
       }
-    } catch (e2) {
-      done(new Error('อุปกรณ์นี้ไม่รองรับการอ่านไฟล์จากหน้า HTML'));
     }
+    setStatus('พร้อมใช้งานแบบออฟไลน์', 'bad');
+    setRuntimeMessage('ดึงข้อมูลผ่าน Google Apps Script ไม่สำเร็จ: ' + (err && err.message ? err.message : 'ไม่ทราบสาเหตุ'), true);
+    showImportNotice('ดึงข้อมูลผ่าน Google Apps Script ไม่สำเร็จ: ' + (err && err.message ? err.message : 'ไม่ทราบสาเหตุ') + ' — ตอนนี้ใช้ข้อมูลสำรองแทน', true);
   }
 
-  function looksReadable(text) {
-    text = normalizeImportedText(text);
-    if (!text) return false;
-    var bad = (text.match(/�/g) || []).length;
-    var good = (text.match(/[ก-๙A-Za-z0-9]/g) || []).length;
-    return good > 0 && bad < good;
+  function extractProductsFromApiPayload(payload) {
+    if (!payload) return [];
+    if (payload.ok === false) {
+      throw new Error(payload.error || 'Google Apps Script ส่งผลลัพธ์ไม่สำเร็จ');
+    }
+    if (Array.isArray(payload.items)) {
+      return normalizeProductsArray(payload.items);
+    }
+    if (Array.isArray(payload.data)) {
+      return normalizeProductsArray(payload.data);
+    }
+    if (Array.isArray(payload.rows)) {
+      return normalizeProductsArray(payload.rows);
+    }
+    return [];
   }
 
-  function importFromText(text, source) {
-    text = normalizeImportedText(text);
-    if (!text) {
-      showImportNotice('กรุณาเลือกไฟล์ หรือวางข้อความก่อนนำเข้า', true);
-      return;
+  function normalizeProductsArray(items) {
+    var out = [];
+    var seen = {};
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i] || {};
+      var record = {
+        productCode: cleanText(item.productCode || item['รหัสสินค้า'] || item.code || item.sku),
+        productName: cleanText(item.productName || item['ชื่อสินค้า'] || item.name),
+        unit: cleanText(item.unit || item['หน่วยนับ'] || item.uom),
+        barcode: cleanText(item.barcode || item['บาร์โค้ด'] || item.ean)
+      };
+      var p = normalizeProduct(record, out.length);
+      if (!p) continue;
+      var key = p.productCode + '|' + p.productName + '|' + p.barcode;
+      if (seen[key]) continue;
+      seen[key] = true;
+      out.push(p);
     }
-    var products = parseProductsFromText(text);
-    if (!products.length) {
-      showImportNotice('ไม่พบรายการสินค้า ตรวจดูว่ามี 4 คอลัมน์: รหัสสินค้า / ชื่อสินค้า / หน่วยนับ / บาร์โค้ด', true);
-      return;
-    }
-    state.products = products;
-    state.sourceLabel = source;
-    state.updatedAt = nowIso();
-    saveState('นำเข้าสำเร็จ ' + products.length + ' รายการ');
-    renderAll();
-    selectProduct(products[0].id);
-    fillFromSelected('barcode');
-    generate();
-    showImportNotice('นำเข้าสำเร็จ ' + products.length + ' รายการ', false);
+    return out;
   }
+
+  // ลบการนำเข้าจากไฟล์และข้อความออกแล้ว ใช้ Google Sheets แทน
 
   function normalizeImportedText(raw) {
     return String(raw == null ? '' : raw)
@@ -1249,9 +1232,9 @@ noscript .fallback, .js-only-hidden { display:none; }
   }
 
   function scrollToBarcode() {
-    var box = els.barcodeValue;
-    if (box && box.scrollIntoView) {
-      box.scrollIntoView({ behavior:'smooth', block:'center' });
+    var section = $('barcodeSection') || els.barcodeValue;
+    if (section && section.scrollIntoView) {
+      section.scrollIntoView({ behavior:'smooth', block:'start' });
     }
   }
 
