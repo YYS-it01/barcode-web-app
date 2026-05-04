@@ -247,12 +247,19 @@
         background: #fecdd3;
         color: #9f1239;
       }
-      .product-list {
+      /* .product-list {
         display: grid;
         gap: 10px;
         max-height: none;
         overflow: visible;
         padding-right: 0;
+      } */
+      .product-list {
+        display: grid;
+        gap: 10px;
+        max-height: 420px;
+        overflow-y: auto;
+        padding-right: 4px;
       }
       .product-btn {
         width: 100%;
@@ -442,36 +449,40 @@
       </details>
 
       <details class="card accordion-card" id="importCard">
-        <summary class="accordion-summary">1) โหลดรายการสินค้าอัตโนมัติ</summary>
+        <summary class="accordion-summary">
+          1) โหลดรายการสินค้าอัตโนมัติ
+        </summary>
         <div class="accordion-body">
           <div class="small">
             แอพจะดึงข้อมูลจาก Google Sheets อัตโนมัติทันทีตอนเปิดหน้า
             และสามารถกดโหลดใหม่ได้ทุกเมื่อ
           </div>
 
-        <div class="toolbar" style="margin-top: 10px">
-          <button type="button" class="primary" id="reloadSheetBtn">
-            โหลดข้อมูลจาก Google Sheets ใหม่
-          </button>
-          <button type="button" id="exportBtn">ส่งออกข้อมูลปัจจุบัน</button>
-          <button type="button" class="danger" id="clearSavedBtn">
-            ล้างข้อมูลที่แคชไว้
-          </button>
-        </div>
-
-        <div class="stats">
-          <div class="stat">
-            <span class="k">แหล่งข้อมูล</span><strong id="sourceText">-</strong>
+          <div class="toolbar" style="margin-top: 10px">
+            <button type="button" class="primary" id="reloadSheetBtn">
+              โหลดข้อมูลจาก Google Sheets ใหม่
+            </button>
+            <button type="button" id="exportBtn">ส่งออกข้อมูลปัจจุบัน</button>
+            <button type="button" class="danger" id="clearSavedBtn">
+              ล้างข้อมูลที่แคชไว้
+            </button>
           </div>
-          <div class="stat">
-            <span class="k">จำนวนสินค้า</span><strong id="countText">0</strong>
-          </div>
-        </div>
 
-        <div id="importNotice" class="notice">
-          ระบบจะอ่านข้อมูลผ่าน Google Apps Script ที่เชื่อมกับชีต Products
-          อัตโนมัติ
-        </div>
+          <div class="stats">
+            <div class="stat">
+              <span class="k">แหล่งข้อมูล</span
+              ><strong id="sourceText">-</strong>
+            </div>
+            <div class="stat">
+              <span class="k">จำนวนสินค้า</span
+              ><strong id="countText">0</strong>
+            </div>
+          </div>
+
+          <div id="importNotice" class="notice">
+            ระบบจะอ่านข้อมูลผ่าน Google Apps Script ที่เชื่อมกับชีต Products
+            อัตโนมัติ
+          </div>
 
           <div class="help-box" style="margin-top: 12px">
             <div><strong>ข้อกำหนดสำคัญ</strong></div>
@@ -1352,15 +1363,24 @@
             productName: productName,
             unit: unit,
             barcode: barcode,
-            searchText: (
-              productCode +
-              " " +
-              productName +
-              " " +
-              unit +
-              " " +
-              barcode
-            ).toLowerCase(),
+            // searchText: (
+            //   productCode +
+            //   " " +
+            //   productName +
+            //   " " +
+            //   unit +
+            //   " " +
+            //   barcode
+            // ).toLowerCase(),
+            searchText: normalizeForSearch(
+              productCode + " " + productName + " " + unit + " " + barcode,
+            ),
+            searchCompact: compactSearch(
+              productCode + " " + productName + " " + unit + " " + barcode,
+            ),
+            searchDigits: onlyDigits(
+              productCode + " " + productName + " " + unit + " " + barcode,
+            ),
           };
         }
 
@@ -1418,30 +1438,89 @@
         }
 
         function renderList() {
-          var q = cleanText(els.searchBox.value).toLowerCase();
+          var rawQ = cleanText(els.searchBox.value);
+          var q = normalizeForSearch(rawQ);
           var tokens = q ? q.split(/\s+/) : [];
           var matched = [];
+
           for (var i = 0; i < state.products.length; i++) {
             var p = state.products[i];
+
+            var nameUnitText = normalizeForSearch(
+              (p.productName || "") + " " + (p.unit || ""),
+            );
+            var nameUnitCompact = compactSearch(nameUnitText);
+            var nameUnitDigits = onlyDigits(nameUnitText);
+
+            var codeBarcodeText = normalizeForSearch(
+              (p.productCode || "") + " " + (p.barcode || ""),
+            );
+            var codeBarcodeCompact = compactSearch(codeBarcodeText);
+            var codeBarcodeDigits = onlyDigits(codeBarcodeText);
+
+            var allText = normalizeForSearch(
+              (p.productCode || "") +
+                " " +
+                (p.productName || "") +
+                " " +
+                (p.unit || "") +
+                " " +
+                (p.barcode || ""),
+            );
+            var allCompact = compactSearch(allText);
+
             var ok = true;
+
             for (var j = 0; j < tokens.length; j++) {
-              if (p.searchText.indexOf(tokens[j]) === -1) {
+              var token = tokens[j];
+              var tokenCompact = compactSearch(token);
+              var tokenDigits = onlyDigits(token);
+
+              var found = false;
+
+              if (tokenDigits && tokenDigits === tokenCompact) {
+                // ถ้าเป็นเลขล้วน เช่น 10, 5, 500
+                // ให้หาในชื่อสินค้า/หน่วยนับก่อน เช่น "10 ลิตร", "(1*10)", "x10"
+                found =
+                  nameUnitText.indexOf(token) !== -1 ||
+                  nameUnitCompact.indexOf(tokenCompact) !== -1 ||
+                  nameUnitDigits.indexOf(tokenDigits) !== -1;
+
+                // ถ้าเลขยาวตั้งแต่ 4 หลักขึ้นไป ค่อยให้ค้นจากรหัส/บาร์โค้ดด้วย
+                // เช่น 5010, 95010011
+                if (!found && tokenDigits.length >= 4) {
+                  found =
+                    codeBarcodeText.indexOf(token) !== -1 ||
+                    codeBarcodeCompact.indexOf(tokenCompact) !== -1 ||
+                    codeBarcodeDigits.indexOf(tokenDigits) !== -1;
+                }
+              } else {
+                // ถ้าเป็นตัวอักษร/คำไทย เช่น โอเล่, แมว, กาแฟ
+                found =
+                  allText.indexOf(token) !== -1 ||
+                  allCompact.indexOf(tokenCompact) !== -1;
+              }
+
+              if (!found) {
                 ok = false;
                 break;
               }
             }
+
             if (ok) matched.push(p);
           }
+
           els.resultCount.innerHTML =
             "พบ " + numberWithCommas(matched.length) + " รายการ";
+
           if (!matched.length) {
             els.productList.innerHTML =
-              '<div class="empty">ไม่พบสินค้าที่ตรงกับคำค้น</div>';
+              '<div class="empty">ไม่พบสินค้าที่ตรงกับคำค้น<br><span class="small">ลองค้นด้วยชื่อสินค้า ขนาด หรือรหัส เช่น โอเล่ 10, กาแฟ, 5010012</span></div>';
             return;
           }
-          var limit = matched.length > 3 ? 3 : matched.length;
+
           var html = "";
-          for (i = 0; i < limit; i++) {
+          for (i = 0; i < matched.length; i++) {
             p = matched[i];
             var cls =
               "product-btn" + (p.id === state.selectedId ? " active" : "");
@@ -1465,10 +1544,7 @@
               "</div>";
             html += "</button>";
           }
-          if (matched.length > limit) {
-            html +=
-              '<div class="empty">แสดง 3 รายการแรก กรุณาพิมพ์ค้นหาเพิ่มเพื่อเจาะจงสินค้า</div>';
-          }
+
           els.productList.innerHTML = html;
         }
 
@@ -1654,7 +1730,12 @@
           ctx.fillStyle = "#111827";
           for (var i = 0; i < pattern.length; i++) {
             if (pattern.charAt(i) === "1") {
-              ctx.fillRect(Math.round(x), 8, Math.max(1, Math.ceil(moduleWidth)), barHeight - 12);
+              ctx.fillRect(
+                Math.round(x),
+                8,
+                Math.max(1, Math.ceil(moduleWidth)),
+                barHeight - 12,
+              );
             }
             x += moduleWidth;
           }
@@ -1665,7 +1746,10 @@
 
           var lineY = detailStartY;
           for (i = 0; i < detailLines.length; i++) {
-            ctx.font = i < titleLines.length ? "600 14px sans-serif" : "400 12px sans-serif";
+            ctx.font =
+              i < titleLines.length
+                ? "600 14px sans-serif"
+                : "400 12px sans-serif";
             ctx.fillText(detailLines[i], width / 2, lineY);
             lineY += 18;
           }
@@ -1992,6 +2076,27 @@
           } catch (e) {
             return String(value);
           }
+        }
+
+        function normalizeForSearch(v) {
+          return cleanText(v)
+            .toLowerCase()
+            .replace(/[๐-๙]/g, function (d) {
+              return "๐๑๒๓๔๕๖๗๘๙".indexOf(d);
+            })
+            .replace(/\s+/g, " ")
+            .trim();
+        }
+
+        function onlyDigits(v) {
+          return normalizeForSearch(v).replace(/\D/g, "");
+        }
+
+        function compactSearch(v) {
+          return normalizeForSearch(v).replace(
+            /[\s\-\_\.\,\/\\\(\)\[\]\{\}\*\+]+/g,
+            "",
+          );
         }
 
         function cleanText(v) {
