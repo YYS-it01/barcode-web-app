@@ -91,6 +91,47 @@
         margin: 0 0 12px;
         font-size: 1.08rem;
       }
+
+      .accordion-card {
+        padding: 0;
+        overflow: hidden;
+      }
+      .accordion-summary {
+        list-style: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px;
+        cursor: pointer;
+        font-weight: 800;
+        font-size: 1.08rem;
+      }
+      .accordion-summary::-webkit-details-marker {
+        display: none;
+      }
+      .accordion-summary::after {
+        content: "⌄";
+        width: 30px;
+        height: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: var(--soft);
+        color: var(--primary-dark);
+        transition: transform 0.18s ease;
+        flex: 0 0 auto;
+      }
+      .accordion-card[open] .accordion-summary::after {
+        transform: rotate(180deg);
+      }
+      .accordion-body {
+        padding: 0 14px 14px;
+      }
+      .accordion-body > :first-child {
+        margin-top: 0;
+      }
       .row,
       .toolbar {
         display: flex;
@@ -209,9 +250,9 @@
       .product-list {
         display: grid;
         gap: 10px;
-        max-height: 420px;
-        overflow-y: auto;
-        padding-right: 2px;
+        max-height: none;
+        overflow: visible;
+        padding-right: 0;
       }
       .product-btn {
         width: 100%;
@@ -261,10 +302,14 @@
         margin-bottom: 10px;
       }
       .canvas-wrap {
-        overflow-x: auto;
+        width: 100%;
+        overflow: hidden;
       }
       canvas {
         display: block;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
         margin: 0 auto;
         background: #fff;
         border-radius: 12px;
@@ -381,25 +426,28 @@
         </div>
       </section>
 
-      <section class="card">
-        <h2>สถานะการทำงาน</h2>
-        <div class="row">
-          <div class="status-chip" id="appStatus">กำลังโหลดสคริปต์...</div>
+      <details class="card accordion-card" open>
+        <summary class="accordion-summary">สถานะการทำงาน</summary>
+        <div class="accordion-body">
+          <div class="row">
+            <div class="status-chip" id="appStatus">กำลังโหลดสคริปต์...</div>
+          </div>
+          <div class="small" style="margin-top: 8px">
+            ถ้าข้อความนี้ไม่เปลี่ยนเป็น “พร้อมใช้งาน”
+            แปลว่าไฟล์ถูกเปิดด้วยตัวพรีวิวที่ไม่รองรับการกดปุ่ม/พิมพ์ข้อความ
+            ให้เปิดด้วย Safari หรือ Chrome แทน
+          </div>
+          <div id="runtimeMessage" class="notice">กำลังเริ่มต้นแอพ...</div>
         </div>
-        <div class="small" style="margin-top: 8px">
-          ถ้าข้อความนี้ไม่เปลี่ยนเป็น “พร้อมใช้งาน”
-          แปลว่าไฟล์ถูกเปิดด้วยตัวพรีวิวที่ไม่รองรับการกดปุ่ม/พิมพ์ข้อความ
-          ให้เปิดด้วย Safari หรือ Chrome แทน
-        </div>
-        <div id="runtimeMessage" class="notice">กำลังเริ่มต้นแอพ...</div>
-      </section>
+      </details>
 
-      <section class="card" id="importCard">
-        <h2>1) โหลดรายการสินค้าอัตโนมัติ</h2>
-        <div class="small">
-          แอพจะดึงข้อมูลจาก Google Sheets อัตโนมัติทันทีตอนเปิดหน้า
-          และสามารถกดโหลดใหม่ได้ทุกเมื่อ
-        </div>
+      <details class="card accordion-card" id="importCard">
+        <summary class="accordion-summary">1) โหลดรายการสินค้าอัตโนมัติ</summary>
+        <div class="accordion-body">
+          <div class="small">
+            แอพจะดึงข้อมูลจาก Google Sheets อัตโนมัติทันทีตอนเปิดหน้า
+            และสามารถกดโหลดใหม่ได้ทุกเมื่อ
+          </div>
 
         <div class="toolbar" style="margin-top: 10px">
           <button type="button" class="primary" id="reloadSheetBtn">
@@ -425,15 +473,16 @@
           อัตโนมัติ
         </div>
 
-        <div class="help-box" style="margin-top: 12px">
-          <div><strong>ข้อกำหนดสำคัญ</strong></div>
-          <div class="small">
-            ให้ Deploy Google Apps Script เป็น Web App แล้วนำ URL มาใส่ในไฟล์
-            HTML ตรงตัวแปร GOOGLE_APPS_SCRIPT_WEB_APP_URL เพื่อหลีกเลี่ยงปัญหา
-            CORS
+          <div class="help-box" style="margin-top: 12px">
+            <div><strong>ข้อกำหนดสำคัญ</strong></div>
+            <div class="small">
+              ให้ Deploy Google Apps Script เป็น Web App แล้วนำ URL มาใส่ในไฟล์
+              HTML ตรงตัวแปร GOOGLE_APPS_SCRIPT_WEB_APP_URL เพื่อหลีกเลี่ยงปัญหา
+              CORS
+            </div>
           </div>
         </div>
-      </section>
+      </details>
 
       <section class="card" id="searchCard">
         <h2>2) ค้นหาและกดเลือกสินค้า</h2>
@@ -865,7 +914,6 @@
               if (id) {
                 if (ev.preventDefault) ev.preventDefault();
                 selectProduct(id);
-                scrollToBarcode();
               }
             }
           }
@@ -1391,7 +1439,7 @@
               '<div class="empty">ไม่พบสินค้าที่ตรงกับคำค้น</div>';
             return;
           }
-          var limit = matched.length > 40 ? 40 : matched.length;
+          var limit = matched.length > 3 ? 3 : matched.length;
           var html = "";
           for (i = 0; i < limit; i++) {
             p = matched[i];
@@ -1419,7 +1467,7 @@
           }
           if (matched.length > limit) {
             html +=
-              '<div class="empty">แสดง 40 รายการแรก กรุณาพิมพ์ค้นหาเพิ่มเพื่อเจาะจงสินค้า</div>';
+              '<div class="empty">แสดง 3 รายการแรก กรุณาพิมพ์ค้นหาเพิ่มเพื่อเจาะจงสินค้า</div>';
           }
           els.productList.innerHTML = html;
         }
@@ -1435,7 +1483,6 @@
         window.handleProductPick = function (id) {
           if (!id) return;
           selectProduct(id);
-          scrollToBarcode();
         };
 
         function getSelected() {
@@ -1526,18 +1573,26 @@
         function drawEmpty() {
           var canvas = els.barcodeCanvas;
           var ctx = canvas.getContext("2d");
-          setupCanvas(320, 180);
+          var width = getCanvasDisplayWidth ? getCanvasDisplayWidth() : 320;
+          setupCanvas(width, 180);
           ctx.fillStyle = "#ffffff";
-          ctx.fillRect(0, 0, 320, 180);
+          ctx.fillRect(0, 0, width, 180);
           ctx.fillStyle = "#6b7280";
           ctx.textAlign = "center";
           ctx.font = "600 16px sans-serif";
-          ctx.fillText("ยังไม่มีบาร์โค้ดสำหรับแสดงผล", 160, 86);
+          ctx.fillText("ยังไม่มีบาร์โค้ดสำหรับแสดงผล", width / 2, 86);
           ctx.font = "400 13px sans-serif";
-          ctx.fillText("เลือกสินค้า หรือกรอกเลขด้านบน", 160, 112);
+          ctx.fillText("เลือกสินค้า หรือกรอกเลขด้านบน", width / 2, 112);
           els.previewTitle.innerHTML = "ตัวอย่างบาร์โค้ด";
           els.previewLines.innerHTML = "ยังไม่มีข้อมูล";
           els.caption.innerHTML = "—";
+        }
+
+        function getCanvasDisplayWidth() {
+          var wrap = document.querySelector(".canvas-wrap");
+          var fallback = Math.max(260, (window.innerWidth || 390) - 54);
+          var width = wrap && wrap.clientWidth ? wrap.clientWidth : fallback;
+          return Math.max(260, Math.floor(width));
         }
 
         function setupCanvas(w, h) {
@@ -1547,6 +1602,7 @@
           canvas.height = Math.round(h * dpr);
           canvas.style.width = w + "px";
           canvas.style.height = h + "px";
+          canvas.style.maxWidth = "100%";
           var ctx = canvas.getContext("2d");
           if (ctx.setTransform) {
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -1563,46 +1619,42 @@
           }
           var quiet = state.render.format === "CODE128" ? 10 : 7;
           var pattern = state.render.pattern;
-          var maxWidth = Math.min((window.innerWidth || 390) - 60, 440);
-          var moduleWidth = Math.max(
-            1.3,
-            Math.min(3.0, maxWidth / (pattern.length + quiet * 2)),
-          );
-          var barHeight = state.render.format === "CODE128" ? 108 : 102;
-          var width = Math.max(
-            360,
-            Math.ceil((pattern.length + quiet * 2) * moduleWidth),
-          );
-          var textY = barHeight + 20;
+          var width = getCanvasDisplayWidth();
+          var drawableWidth = width - 24;
+          var moduleWidth = drawableWidth / (pattern.length + quiet * 2);
+          moduleWidth = Math.max(0.8, Math.min(2.6, moduleWidth));
+          var barcodeWidth = pattern.length * moduleWidth;
+          var barHeight = state.render.format === "CODE128" ? 112 : 104;
+          var textY = barHeight + 24;
           var detailStartY = textY + 28;
           var detailLines = [];
-          detailLines = detailLines.concat(
-            wrapCanvasText(
-              state.render.title || "",
-              width - 28,
-              "600 14px sans-serif",
-            ),
+          var titleLines = wrapCanvasText(
+            state.render.title || "",
+            width - 28,
+            "600 14px sans-serif",
           );
+          detailLines = detailLines.concat(titleLines);
           for (var di = 0; di < state.render.lines.length; di++) {
             var wrapped = wrapCanvasText(
               state.render.lines[di],
               width - 28,
               "400 12px sans-serif",
             );
-            for (var dj = 0; dj < wrapped.length; dj++)
+            for (var dj = 0; dj < wrapped.length; dj++) {
               detailLines.push(wrapped[dj]);
+            }
           }
-          var height = detailStartY + detailLines.length * 18 + 12;
+          var height = detailStartY + detailLines.length * 18 + 14;
           setupCanvas(width, height);
           var canvas = els.barcodeCanvas;
           var ctx = canvas.getContext("2d");
           ctx.fillStyle = "#ffffff";
           ctx.fillRect(0, 0, width, height);
-          var x = (width - pattern.length * moduleWidth) / 2;
+          var x = (width - barcodeWidth) / 2;
           ctx.fillStyle = "#111827";
           for (var i = 0; i < pattern.length; i++) {
             if (pattern.charAt(i) === "1") {
-              ctx.fillRect(x, 8, moduleWidth, barHeight - 12);
+              ctx.fillRect(Math.round(x), 8, Math.max(1, Math.ceil(moduleWidth)), barHeight - 12);
             }
             x += moduleWidth;
           }
@@ -1613,15 +1665,7 @@
 
           var lineY = detailStartY;
           for (i = 0; i < detailLines.length; i++) {
-            ctx.font =
-              i <
-              wrapCanvasText(
-                state.render.title || "",
-                width - 28,
-                "600 14px sans-serif",
-              ).length
-                ? "600 14px sans-serif"
-                : "400 12px sans-serif";
+            ctx.font = i < titleLines.length ? "600 14px sans-serif" : "400 12px sans-serif";
             ctx.fillText(detailLines[i], width / 2, lineY);
             lineY += 18;
           }
@@ -1982,6 +2026,21 @@
           }
           return hash;
         }
+
+        window.addEventListener(
+          "resize",
+          function () {
+            window.clearTimeout(state._resizeTimer);
+            state._resizeTimer = window.setTimeout(function () {
+              if (state.render) {
+                drawBarcode();
+              } else {
+                drawEmpty();
+              }
+            }, 120);
+          },
+          false,
+        );
 
         if (document.readyState === "loading") {
           document.addEventListener("DOMContentLoaded", init, false);
